@@ -20,6 +20,8 @@ import warnings
 import uuid
 import os
 import logging
+import time
+
 
 # Import the Cognito validation module
 import cognito
@@ -60,6 +62,8 @@ class BedrockStreamManager:
         """Initialize the stream manager."""
         self.model_id = model_id
         self.region = region
+        self.last_credential_refresh = 0
+
 
         # Audio and output queues
         self.audio_input_queue = asyncio.Queue()
@@ -79,6 +83,9 @@ class BedrockStreamManager:
         self.toolName = ""
 
     def _initialize_client(self):
+
+        self.last_credential_refresh = time.time()
+
         """Initialize the Bedrock client."""
         config = Config(
             endpoint_uri=f"https://bedrock-runtime.{self.region}.amazonaws.com",
@@ -89,7 +96,17 @@ class BedrockStreamManager:
         )
         self.bedrock_client = BedrockRuntimeClient(config=config)
 
+    def _ensure_fresh_client(self):
+        """Check if credentials need refresh and reinitialize client if needed."""
+        # Refresh client every 25 minutes to ensure fresh credentials
+        if time.time() - self.last_credential_refresh > 1500:  # 25 minutes in seconds
+            logger.info("Refreshing Bedrock client with new credentials")
+            self._initialize_client()
+
     async def initialize_stream(self):
+
+        self._ensure_fresh_client()
+
         """Initialize the bidirectional stream with Bedrock."""
         if not self.bedrock_client:
             self._initialize_client()
