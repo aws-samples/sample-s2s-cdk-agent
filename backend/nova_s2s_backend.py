@@ -13,16 +13,14 @@
 # permissions and limitations under the License.
 #
 
-import asyncio
-import websockets
 import json
-import warnings
-import uuid
-import os
 import logging
-import time
+import os
+import uuid
+import warnings
+import asyncio
 import requests
-
+import websockets
 
 # Import the Cognito validation module
 import cognito
@@ -54,6 +52,8 @@ logger = logging.getLogger(__name__)
 
 # Suppress warnings
 warnings.filterwarnings("ignore")
+# Suppress websockets server non-critical logs that are triggered by NLB health checks (empty TCP packets)
+logging.getLogger("websockets.server").setLevel(logging.CRITICAL)
 
 
 class BedrockStreamManager:
@@ -64,7 +64,6 @@ class BedrockStreamManager:
         self.model_id = model_id
         self.region = region
         self.last_credential_refresh = 0
-
 
         # Audio and output queues
         self.audio_input_queue = asyncio.Queue()
@@ -93,12 +92,14 @@ class BedrockStreamManager:
                 response = requests.get(f"http://169.254.170.2{uri}")
                 if response.status_code == 200:
                     creds = response.json()
-                    os.environ['AWS_ACCESS_KEY_ID'] = creds['AccessKeyId']
-                    os.environ['AWS_SECRET_ACCESS_KEY'] = creds['SecretAccessKey']
-                    os.environ['AWS_SESSION_TOKEN'] = creds['Token']
+                    os.environ["AWS_ACCESS_KEY_ID"] = creds["AccessKeyId"]
+                    os.environ["AWS_SECRET_ACCESS_KEY"] = creds["SecretAccessKey"]
+                    os.environ["AWS_SESSION_TOKEN"] = creds["Token"]
                     logger.info("AWS credentials refreshed successfully")
                 else:
-                    logger.error(f"Failed to fetch fresh credentials: {response.status_code}")
+                    logger.error(
+                        f"Failed to fetch fresh credentials: {response.status_code}"
+                    )
         except Exception as e:
             logger.error(f"Error refreshing credentials: {str(e)}")
 
@@ -111,7 +112,6 @@ class BedrockStreamManager:
             http_auth_schemes={"aws.auth#sigv4": SigV4AuthScheme()},
         )
         self.bedrock_client = BedrockRuntimeClient(config=config)
-
 
     def _ensure_fresh_client(self):
         """Ensure client has fresh credentials by reinitializing."""
