@@ -20,6 +20,8 @@ Backend stopped working after 6 hours due to AWS credential expiration. The expe
 
 NLB health checks sent empty TCP packets for health checks and the backend WebSocket process kept outputting logs so much every minute. It was hard to find the right logs for your tool invocation and build on top of this sample. Now, it contains essential logs only. See https://github.com/aws-samples/sample-sonic-cdk-agent/pull/9 for details.
 
+- [chore] Updated outdated dependencies
+
 ## [0.1.0] - 2025-04-09
 
 - Initial version released.
