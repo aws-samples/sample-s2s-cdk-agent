@@ -1,8 +1,8 @@
 # Nova S2S Call Center Agent w/ Tools
 
-By Reilly Manton (rcmanton@amazon.com); Shuto Araki (shuaraki@amazon.nl); Andrew Young (ajuny@amazon.com)
+By Reilly Manton (rcmanton@amazon.com); Shuto Araki (shuaraki@amazon.com); Andrew Young (ajuny@amazon.com)
 
-This template provides an AWS cloud-based solution for deploying applications that interact with the Nova S2S Sonic Model. It serves as a foundation for developing future speech-to-speech (S2S) tooling use cases. Unlike previous implementations that required locally hosted backends and frontends, this cloud architecture leverages:
+This template provides an AWS cloud-based solution for deploying applications that interact with the Nova S2S Sonic Model. It serves as a foundation for developing future speech-to-speech (S2S) tooling use cases. Unlike previous implementations that required locally hosted backend and frontend, this cloud architecture leverages:
 
 - **Frontend:** Hosted on Amazon CloudFront and S3
 - **Backend:** Deployed on Amazon ECS
@@ -48,23 +48,28 @@ The sample application demonstrates Amazon Bedrock's Nova speech-to-speech model
 
 ### Prerequisites
 
+The versions below are tested and validated. Minor version differences would likely be acceptable.
+
 - Python 3.12
 - Node.js v20
 - Node Package Manager (npm) v10.8
+- Docker v27.4
 - AWS Account
+- Amazon Nova Sonic is enabled via the [Bedrock model access console](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess)
+- Chrome or Safari browser environment (Firefox is currently not supported)
 - Working microphone and speakers
 
 ### Deployment
 
 1. Update the environment variables to point to your Amazon Dynamodb table and your Bedrock Knowledge Base
 
-Copy `template.env` to a new file `.env` and update the `KNOWLEDGE_BASE_ID` and `DYNAMODB_TABLE_NAME` to your knowledge base ID and your table name. For table structure, the tool expects phone_number (S) as the primary key and you can add any other keys you want.
+Copy `template.env` to a new file `.env` and update the `KNOWLEDGE_BASE_ID` and `DYNAMODB_TABLE_NAME` to your knowledge base ID and your table name. For table structure, the tool expects `phone_number` (S) as the primary key (assuming telecom call center use case) and you can add any other keys you want. (e.g., "plan", "current_bill", etc.) Ask about those attributes in the chat to find a good
 
 If you want to bring your own VPC rather than the solution deploying a new VPC for you, specify your VPC ID in `VPC_ID`.
 
 2. Ensure you are deploying to aws region `us-east-1` since this is the only region that currently supports Amazon Nova Sonic S2S model in Amazon Bedrock.
 
-3. Run the deployment script to deploy two stacks: Network and S2S.
+3. Run the deployment script to deploy two stacks: Network and S2S. Make sure both stacks get deployed.
 
 `./deploy.sh`
 
@@ -104,7 +109,7 @@ aws cognito-idp admin-create-user \
 - `USERNAME`: The desired username for the user.
 - `USER_EMAIL`: The email address of the user.
 - `TEMPORARY_PASSWORD`: A temporary password for the user.
-- `YOUR_AWS_REGION`: Your AWS region (e.g., `us-west-1`).
+- `YOUR_AWS_REGION`: Your AWS region (e.g., `us-east-1`).
 
 2. **Log in and change password**
    Click on the frontend URL with the username and temporary password you just created. You will be asked to change the password when you first log in.
@@ -186,34 +191,31 @@ tools: [
 
 ```python
 async def processToolUse(self, toolName, toolUseContent):
-    """Return the tool result"""
-    tool = toolName.lower()
+        """Return the tool result"""
+        tool = toolName.lower()
+        results = {}
 
-    if tool == "lookup":
-        # Extract query from toolUseContent
-        if isinstance(toolUseContent, dict) and "content" in toolUseContent:
-            # Parse the JSON string in the content field
-            query_json = json.loads(toolUseContent.get("content"))
-            query = query_json.get("query", "")
-            logger.info(f"Extracted KB lookup query")
+        if tool == "lookup":
+            # Extract query from toolUseContent
+            if isinstance(toolUseContent, dict) and "content" in toolUseContent:
+                # Parse the JSON string in the content field
+                query_json = json.loads(toolUseContent.get("content"))
+                query = query_json.get("query", "")
+                logger.info(f"Extracted KB lookup query")
 
-            # Call the knowledge base lookup
-            results = knowledge_base_lookup.main(query)
+                # Call the knowledge base lookup
+                results = knowledge_base_lookup.main(query)
 
-        return results  # Return the raw results, not wrapped in {"content": json.dumps(results)}
+        elif tool == "userprofilesearch":
+            if isinstance(toolUseContent, dict) and "content" in toolUseContent:
+                # Parse the JSON string in the content field
+                phone_number_json = json.loads(toolUseContent.get("content"))
+                phone_number = phone_number_json.get("phone_number", "")
+                logger.info(f"Extracted phone number.")
 
-    elif tool == "userprofilesearch":
-        if isinstance(toolUseContent, dict) and "content" in toolUseContent:
-            # Parse the JSON string in the content field
-            phone_number_json = json.loads(toolUseContent.get("content"))
-            phone_number = phone_number_json.get("phone_number", "")
-            logger.info(f"Extracted phone number.")
+                results = retrieve_user_profile.main(phone_number)
 
-            results = retrieve_user_profile.main(phone_number)
-
-        return results  # Return the raw results, not wrapped
-
-    return {}
+        return results
 ```
 
 ### Local frontend development
@@ -230,4 +232,6 @@ VITE_COGNITO_DOMAIN=https://auth.example.com
 
 ## FAQ/trouble shooting
 
-1. We are aware of an issue where the health checks repeatedly fail and cause errors in the ECS logs. This does not impact the application functionality but it can make troubleshooting challenging. We will open an issue to track this change.
+1. The default prompt asks me for my phone number, but when I tell it a number that doesn't exist in my DynamoDB table, the conversation stops. What should I do?
+
+- It is currently designed to fail in the backend and stop the conversation. Take a look at the ECS logs and see if the tool use is invoked and handle errors that fits your use case.
