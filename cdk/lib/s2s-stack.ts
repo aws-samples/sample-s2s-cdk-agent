@@ -16,6 +16,7 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
+import * as ecr from "aws-cdk-lib/aws-ecr-assets";
 import * as ecs from "aws-cdk-lib/aws-ecs";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as path from "path";
@@ -153,6 +154,7 @@ export class S2SAppStack extends cdk.Stack {
         path.join(__dirname, "../../backend"),
         {
           buildArgs: {},
+          platform: ecr.Platform.LINUX_ARM64,
         }
       ),
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: "websocket" }),
