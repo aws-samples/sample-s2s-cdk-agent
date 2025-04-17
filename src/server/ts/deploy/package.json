@@ -1,0 +1,23 @@
+{
+  "name": "gowssip-cdk",
+  "version": "1.0.0",
+  "description": "CDK deployment for gowssip application",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "deploy": "cdk deploy",
+    "synth": "cdk synth"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.124.0",
+    "constructs": "^10.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "aws-cdk": "^2.124.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

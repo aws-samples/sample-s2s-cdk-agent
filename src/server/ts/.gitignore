@@ -1,0 +1,8 @@
+**/node_modules/**
+.git/**
+**/.env
+private.key
+vonage-app.json
+server.pid
+dist/**
+*.pem

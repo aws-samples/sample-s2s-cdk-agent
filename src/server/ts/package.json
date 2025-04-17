@@ -1,0 +1,32 @@
+{
+  "name": "amazon-nova-sonic-server",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/server.ts"
+  },
+  "author": "andrewjunyoung",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.785.0",
+    "@aws-sdk/credential-providers": "^3.782.0",
+    "@smithy/node-http-handler": "^4.0.4",
+    "aws-sdk": "^2.1692.0",
+    "axios": "^1.8.4",
+    "body-parser": "^2.2.0",
+    "expres": "^0.0.5",
+    "express": "^5.1.0",
+    "express-ws": "^5.0.2",
+    "http": "^0.0.1-security",
+    "rxjs": "^7.8.2",
+    "s": "^1.0.0",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/express-ws": "^3.0.5",
+    "@types/ws": "^8.18.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
