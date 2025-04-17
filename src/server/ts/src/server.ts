@@ -31,8 +31,8 @@ const bedrockClient = new NovaSonicBidirectionalStreamClient({
   },
 });
 
-const useVonage: boolean = true;
-const useJson: boolean = true;
+const useVonage: boolean = process.env.USE_VONAGE === "true" || false;
+const useJson: boolean = process.env.USE_JSON === "true" || true;
 
 /* Periodically check for and close inactive sessions (every minute).
  * Sessions with no activity for over 5 minutes will be force closed
