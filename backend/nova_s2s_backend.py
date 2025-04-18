@@ -85,6 +85,7 @@ class BedrockStreamManager:
     def _initialize_client(self):
         """Initialize the Bedrock client with fresh credentials."""
         # Fetch fresh credentials from ECS container metadata endpoint
+        # The whole task gets restart every 5 hours, but leaving this logic as a backup refresh method: tools will stop working, but Nova Sonic connection will still work.
         try:
             uri = os.environ.get("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI")
             if uri:
@@ -119,10 +120,10 @@ class BedrockStreamManager:
         self._initialize_client()
 
     async def initialize_stream(self):
+        """Initialize the bidirectional stream with Bedrock."""
 
         self._ensure_fresh_client()
 
-        """Initialize the bidirectional stream with Bedrock."""
         if not self.bedrock_client:
             self._initialize_client()
 
@@ -346,7 +347,11 @@ class BedrockStreamManager:
                                         content_json_string = str(toolResult)
 
                                     # check if tool use resulted in an error that needs to be reported to Sonic
-                                    status = 'error' if toolResult.get('status') == 'error' else 'success'
+                                    status = (
+                                        "error"
+                                        if toolResult.get("status") == "error"
+                                        else "success"
+                                    )
                                     # logger.info(f"Tool result {toolResult} and value of status is {status}")
 
                                     tool_result_event = {
@@ -355,7 +360,7 @@ class BedrockStreamManager:
                                                 "promptName": self.prompt_name,
                                                 "contentName": toolContent,
                                                 "content": content_json_string,
-                                                "status" : status
+                                                "status": status,
                                             }
                                         }
                                     }
