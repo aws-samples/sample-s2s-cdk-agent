@@ -30,8 +30,9 @@ load_dotenv()
 
 defaultResponse = {
     "status": "error",
-    "response": "Sorry we couldn't locate you in our records with phone# {phone_number}. Could you please check your details again?"
+    "response": "Sorry we couldn't locate you in our records with phone# {phone_number}. Could you please check your details again?",
 }
+
 
 def get_dynamodb_table_name():
     """
@@ -79,7 +80,7 @@ def lookup_phone_number(phone_number: str):
             return response["Item"]
         else:
             logger.info(f"No DDB entry found for phone number")
-            #set the phone number received for look up and send message back to Sonic that we couldn't locate it in our records. Could you please check your details again?
+            # set the phone number received for look up and send message back to Sonic that we couldn't locate it in our records. Could you please check your details again?
             defaultResponse["phone_number"] = phone_number
             return defaultResponse
 
@@ -100,7 +101,7 @@ def lookup_phone_number(phone_number: str):
         else:
             logger.error(f"DynamoDB ClientError: {error_code} - {error_message}")
             raise RuntimeError(f"DynamoDB error: {error_message}")
-    
+
     except ConnectionError as e:
         logger.error(f"Network error connecting to AWS: {str(e)}")
         raise ConnectionError(f"Network error connecting to AWS: {str(e)}")
@@ -109,7 +110,7 @@ def lookup_phone_number(phone_number: str):
         logger.error(f"Unexpected error querying DynamoDB: {str(e)}")
         raise RuntimeError(f"Error querying DynamoDB: {str(e)}")
 
-    
+
 def main(phone_number: str):
     """
     Main function to process phone number lookup requests.

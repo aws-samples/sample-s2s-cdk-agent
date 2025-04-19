@@ -14,19 +14,23 @@
  */
 
 import * as cdk from "aws-cdk-lib";
-import { Construct } from "constructs";
-import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
+import * as cognito from "aws-cdk-lib/aws-cognito";
+import * as cr from "aws-cdk-lib/custom-resources";
 import * as ecr from "aws-cdk-lib/aws-ecr-assets";
 import * as ecs from "aws-cdk-lib/aws-ecs";
-import * as iam from "aws-cdk-lib/aws-iam";
-import * as path from "path";
-import * as cognito from "aws-cdk-lib/aws-cognito";
-import * as lambda from "aws-cdk-lib/aws-lambda";
-import { Duration } from "aws-cdk-lib";
 import * as elbv2 from "aws-cdk-lib/aws-elasticloadbalancingv2";
-import * as cr from "aws-cdk-lib/custom-resources";
-import { NetworkStack } from "./network-stack";
+import * as events from "aws-cdk-lib/aws-events";
+import * as iam from "aws-cdk-lib/aws-iam";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
+import * as targets from "aws-cdk-lib/aws-events-targets";
+import * as path from "path";
+import { Construct } from "constructs";
+import { Duration } from "aws-cdk-lib";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+
 import EnforceDeletionPolicy from "./EnforceDeletionPolicyAspect";
+import { NetworkStack } from "./network-stack";
 
 export interface S2SAppStackProps extends cdk.StackProps {
   networkStack: NetworkStack;
@@ -200,6 +204,43 @@ export class S2SAppStack extends cdk.Stack {
     });
   }
 
+  // Temporary workaround to force credential refresh every 5 hours by stopping tasks
+  // (until official Python SDK supports automatic credential fetching from ECS task role)
+  temp_addTasksRotateLambda(
+    ecsService: ecs.FargateService,
+    ecsCluster: ecs.Cluster
+  ) {
+    const taskRotater = new NodejsFunction(this, "ECSTaskRotateLambda", {
+      runtime: lambda.Runtime.NODEJS_LATEST,
+      entry: path.join(__dirname, "../lambda/ecsTaskRotater/index.ts"),
+      handler: "handler",
+      timeout: Duration.minutes(10),
+      environment: {
+        ECS_CLUSTER_NAME: ecsCluster.clusterName,
+        ECS_SERVICE_NAME: ecsService.serviceName,
+      },
+    });
+    taskRotater.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ["ecs:ListTasks", "ecs:StopTask"],
+        resources: ["*"],
+        conditions: {
+          ArnEquals: {
+            "ecs:cluster": ecsCluster.clusterArn,
+          },
+        },
+      })
+    );
+    // Create EventBridge rule to trigger the Lambda every 5 hours: before credentials expire (6 hours)
+    const rule = new events.Rule(this, "ScheduleTaskRotation", {
+      schedule: events.Schedule.rate(Duration.hours(5)),
+      description: "Triggers ECS task rotation every 5 hours",
+    });
+
+    // Add the Lambda function as a target for the rule
+    rule.addTarget(new targets.LambdaFunction(taskRotater));
+  }
+
   createFrontendConfig() {
     const configCreatorFunction = new lambda.Function(
       this,
@@ -315,6 +356,8 @@ export class S2SAppStack extends cdk.Stack {
     );
     const wsService = this.createContainerDefinition(ecsCluster, wsTaskDef);
     this.registerLoadBalancerTarget(wsService);
+    // This is a temporary workaround to the lack of credential refresh in the experimental Python SDK
+    this.temp_addTasksRotateLambda(wsService, ecsCluster);
 
     this.createFrontendConfig();
 

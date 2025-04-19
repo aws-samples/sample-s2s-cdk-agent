@@ -1,5 +1,6 @@
 frontend/dist/**
 cdk.context.json
+.roo
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,macos,visualstudiocode,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,macos,visualstudiocode,node
