@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [feature] Easier system prompt adjustment from the UI
 - [developer experience] Easier custom tool extension
 
+## [0.1.2] - 2025-04-20
+
+- [bug fix] Tool use works after 6 hours.
+
+Tool use stopped working after 6 hours due to AWS credential expiration. Because the bug fix for the experimental uses environment variables, the regular boto3 credential refresh with container metadata service stopped working. As a temporary solution, ECS tasks are stopped (and restarted) every 5 hours.
+
+This change disrupts the backend connection every 5 hours, but we chose this simpler fix over a custom credentials retrieval logic that bloats the backend logic that makes it harder to add tools. This temporary fix will be removed after the experimental Python SDK becomes official. See https://github.com/aws-samples/sample-sonic-cdk-agent/pull/17 for details.
+
 ## [0.1.1] - 2025-04-16
 
 - [bug fix] Sample application works after 6 hours.
