@@ -224,7 +224,13 @@ async def processToolUse(self, toolName, toolUseContent):
 
 ### Local development
 
-🚧 Coming soon: we are looking for ways to make development easier by running both frontend and backend locally (See: https://github.com/aws-samples/sample-sonic-cdk-agent/issues/19)
+Assume credentials for an AWS account with Nova S2S enabled in Amazon Bedrock and export: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN`.
+
+Run `npm run dev` in the same shell session as above to start frontend and backend containers.
+Both use a file watching mechanism to be notified of local code changes and reload automatically.
+Re-run the `npm` command only if changes are made to the Dockerfile, Python libraries or NPM dependencies that require installation, as these are not picked up by the file watcher.
+
+The frontend is accessible at http://localhost:5173/ and the backend at http://localhost:8080/, with authentication disabled for both.
 
 ## FAQ/trouble shooting
 
@@ -236,3 +242,7 @@ async def processToolUse(self, toolName, toolUseContent):
 ARG TARGETARCH=arm64
 FROM --platform=$TARGETARCH python:3.12
 ```
+
+2. `npm run dev` hangs and the backend container does not exit
+
+To force the backend container to stop, run `docker rm -f s2s-backend-dev`.

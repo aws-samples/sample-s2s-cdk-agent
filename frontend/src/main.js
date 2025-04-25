@@ -29,12 +29,9 @@ let uiInitialized = false; // Track if UI has been initialized
 
 // Initialize on page load
 document.addEventListener("DOMContentLoaded", async () => {
-  // Initialize Cognito authentication first
-  cognitoAuth = getCognitoAuth();
-
-  // Handle authentication before initializing the app
   try {
-    const isAuthenticated = await cognitoAuth.handleAuth();
+    // Attempt authentication
+    const isAuthenticated = await doCognitoAuthentication();
 
     if (isAuthenticated) {
       // Create HTML structure if not already created
@@ -137,6 +134,19 @@ function showSaveConfirmation() {
       saveConfirmationElement.style.display = "none";
     }, 2000);
   }
+}
+
+// Handle authentication process
+async function doCognitoAuthentication() {
+  // Bypass authentication in development mode
+  if (import.meta.env.DEV) {
+    console.log("Running in local development mode, bypassing authentication.");
+    return true;
+  }
+
+  cognitoAuth = getCognitoAuth();
+  const isAuthenticated = await cognitoAuth.handleAuth();
+  return isAuthenticated;
 }
 
 // Logout function
@@ -522,14 +532,14 @@ function createHtmlStructure() {
           </div>
         </div>
       </div>
-      
+
       <!-- System Prompt Editor (initially hidden) -->
       <div id="system-prompt-container" style="display: none;">
         <h2>System Prompt Editor</h2>
         <div id="save-confirmation" style="display: none;">Saved!</div>
         <div class="editor-container">
-          <textarea 
-            id="system-prompt-textarea" 
+          <textarea
+            id="system-prompt-textarea"
             class="system-prompt-textarea"
             placeholder="Enter system prompt here..."
           ></textarea>
@@ -538,13 +548,13 @@ function createHtmlStructure() {
           </div>
         </div>
       </div>
-      
+
       <div id="chat-container"></div>
-      
+
       <div id="controls">
         <!-- Controls moved to header area -->
       </div>
-      
+
       <div class="footer">
         <div>Voice Chat Interface v1.0</div>
       </div>

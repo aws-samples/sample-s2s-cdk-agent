@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM python:3.13-alpine
 
 WORKDIR /app
 
@@ -6,8 +6,8 @@ WORKDIR /app
 COPY requirements.txt ./
 
 # Install dependencies
+RUN apk add --update jq curl py-pip inotify-tools
 RUN pip install --no-cache-dir -r requirements.txt
-RUN apt-get update && apt-get install -y jq curl 
 
 # Copy the Python files and .env
 COPY nova_s2s_backend.py knowledge_base_lookup.py retrieve_user_profile.py cognito.py entrypoint.sh .env ./
@@ -19,6 +19,3 @@ ENV LOGLEVEL=INFO
 
 RUN chmod +x entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
-
-# Command to run the application
-CMD ["python", "nova_s2s_backend.py"]

@@ -4,7 +4,10 @@
   "private": true,
   "description": "A package which deploys speech-to-speech utilities to AWS using CDK.",
   "scripts": {
-    "dev": "cd frontend && npm run dev",
+    "generate-config": "echo \"window.APP_CONFIG = { cognitoUserPoolId: '', cognitoAppClientId: '', backendEndpoint: 'http://localhost:8080/', appUrl: 'http://localhost:5173/', cognitoDomain: '' };\" > frontend/config.js",
+    "dev": "npm run generate-config && concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && docker build -t s2s-backend-dev . && docker run --name s2s-backend-dev --rm -p 8080:80 --volume ./:/app -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} -e AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} -e DEV_MODE=true s2s-backend-dev",
     "build": "npm run build:frontend && npm run build:cdk",
     "build:frontend": "cd frontend && npx vite build",
     "cdk:build": "npm run build:frontend && cd cdk && npm run build",
@@ -15,5 +18,7 @@
     "frontend",
     "cdk"
   ],
-  "devDependencies": {}
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
 }

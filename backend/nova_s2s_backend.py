@@ -19,7 +19,6 @@ import os
 import uuid
 import warnings
 import asyncio
-import requests
 import websockets
 
 # Import the Cognito validation module
@@ -49,6 +48,7 @@ import retrieve_user_profile
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 logging.basicConfig(level=LOGLEVEL, format="%(asctime)s %(message)s")
 logger = logging.getLogger(__name__)
+RUNNING_IN_DEV_MODE = os.environ.get("DEV_MODE", "False").lower() == "true"
 
 # Suppress warnings
 warnings.filterwarnings("ignore")
@@ -404,7 +404,7 @@ class BedrockStreamManager:
 async def websocket_handler(websocket, url, headers=None):
     """Handle WebSocket connections from the frontend with authentication."""
     # Validate the WebSocket connection using Cognito
-    is_valid, claims = cognito.validate_websocket_request(url, headers)
+    is_valid, claims = cognito.validate_websocket_request(url, headers) if not RUNNING_IN_DEV_MODE else True, {}
 
     if not is_valid:
         # Log the failure with more detail
@@ -536,10 +536,10 @@ async def authenticated_handler(websocket, path=None):
 
     # Validate token directly from path
     # First try to extract and validate the token directly
-    token = cognito.extract_token_from_url(path)
+    token = cognito.extract_token_from_url(path) if not RUNNING_IN_DEV_MODE else True
 
     if token:
-        is_valid, claims = cognito.validate_token(token)
+        is_valid, _ = cognito.validate_token(token) if not RUNNING_IN_DEV_MODE else True, None
 
         if not is_valid:
             # Failed authentication
@@ -590,7 +590,6 @@ async def main():
     try:
         async with websockets.serve(authenticated_handler, host, port):
             logger.info(f"WebSocket server started {host}:{port}")
-
             # Keep the server running forever
             await asyncio.Future()
     except Exception as e:
