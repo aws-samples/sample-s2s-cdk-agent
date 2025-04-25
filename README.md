@@ -224,7 +224,7 @@ async def processToolUse(self, toolName, toolUseContent):
 
 ### Local development
 
-Assume credentials for an AWS account with Nova S2S enabled in Amazon Bedrock and export: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN`.
+Assume credentials for an AWS account with Amazon Nova Sonic enabled in Amazon Bedrock and export: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN`.
 
 Run `npm run dev` in the same shell session as above to start frontend and backend containers.
 Both use a file watching mechanism to be notified of local code changes and reload automatically.
@@ -243,6 +243,6 @@ ARG TARGETARCH=arm64
 FROM --platform=$TARGETARCH python:3.12
 ```
 
-2. `npm run dev` hangs and the backend container does not exit
+2. `npm run dev` hangs and the backend container does not exit. I get the error `docker: Error response from daemon: driver failed programming external connectivity on endpoint s2s-backend-dev` when I try to run the command again.
 
-To force the backend container to stop, run `docker rm -f s2s-backend-dev`.
+Run `docker rm -f s2s-backend-dev` to remove the running container image and run `npm run dev` again.
