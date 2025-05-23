@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adapt to an official version of the async clients for the [AWS SDK for Python](https://github.com/awslabs/aws-sdk-python/tree/develop) when the experimental one becomes official.
 - [developer experience] Easier custom tool extension (through some framework)
 
+## [0.1.3] - 2025-05-22
+
+- [developer experience] Tools are now defined using the popular Model Context Protocol (MCP) framework.
+
+Integrated with the widely-adopted MCP standard for tool definitions, making it easier to share and reuse tools across different AI applications and environments.
+
 ## [0.1.3] - 2025-04-25
 
 - [developer experience] You can now locally develop both frontend and backend before you deploy.

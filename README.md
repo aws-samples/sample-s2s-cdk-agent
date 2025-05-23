@@ -134,93 +134,44 @@ You can change the system prompt from the UI.
 
 ### Tooling
 
-Tooling for Amazon Nova Sonic is implemented in the backend python application. Amazon Nova Sonic outputs text indicating it wants to use a tool, the code parses and uses the tool, and the tool response is returned back to the model for use in generation.
+Tooling for Amazon Nova Sonic is implemented using the Model Context Protocol (MCP) in the backend Python application. Amazon Nova Sonic outputs text indicating it wants to use a tool, the MCP server processes the tool call, and the response is returned back to the model for use in generation.
 
 To add a new tool:
 
-1. Add a new toolSpec in `frontend/websocketEvents.js`.
+1. **Define the tool using MCP decorators** in `backend/tools.py`.
 
-In our example there are two tools, knowledge base lookup and user profile search. To add your own toolspec, give it a name, description, and input schema. The model uses the description to know when to use the tool, the name to reference it, and the schema to understand the input format. For example, the schema for the "lookup" tool here contains an input parameter "query" of type string that is described as "the query to search". It is specified as required.
+Tools are defined using the `@mcp_server.tool()` decorator with explicit type annotations. The MCP server automatically generates the tool specifications that get sent to Amazon Nova Sonic. Give your tool a name, description, and specify the input parameters with types. The model uses the description to know when to use the tool and the parameter descriptions to understand the input format.
 
-```javascript
-tools: [
-  {
-    toolSpec: {
-      name: "lookup",
-      description:
-        "Runs query against a knowledge base to retrieve information.",
-      inputSchema: {
-        json: JSON.stringify({
-          $schema: "http://json-schema.org/draft-07/schema#",
-          type: "object",
-          properties: {
-            query: {
-              type: "string",
-              description: "the query to search",
-            },
-          },
-          required: ["query"],
-        }),
-      },
-    },
-  },
-  {
-    toolSpec: {
-      name: "userProfileSearch",
-      description:
-        "Search for a user's account and phone plan information by phone number",
-      inputSchema: {
-        json: JSON.stringify({
-          $schema: "http://json-schema.org/draft-07/schema#",
-          type: "object",
-          properties: {
-            phone_number: {
-              type: "string",
-              description: "the user's phone number",
-            },
-          },
-          required: ["phone_number"],
-        }),
-      },
-    },
-  },
-];
-```
-
-2. Implement the tool in the python backend. You can make a new python file to implement the tool, like how `backend/retrieve_user_profile.py` implements the user lookup tool and `backend/knowledge_base_lookup.py` implements the knowledge base search tool. These examples show how you can interact with AWS resources via these tools to retrieve real information for the model.
-
-3. Import your new tool implementation in `backend/nova_s2s_backend.py`. For example, we import the `backend/retrieve_user_profile.py` like `import knowledge_base_lookup`.
-
-4. Add logic to call your tool in `backend/nova_s2s_backend.py` in the function `processToolUse`. In this method, we parse the Amazon Nova Sonic's tool request to find the tool name and any tool inputs. We then call the `main()` method in the python file that implements that tool.
+In our example there are two tools, knowledge base lookup and user profile search. To add your own tool, follow this pattern:
 
 ```python
-async def processToolUse(self, toolName, toolUseContent):
-        """Return the tool result"""
-        tool = toolName.lower()
-        results = {}
-
-        if tool == "lookup":
-            # Extract query from toolUseContent
-            if isinstance(toolUseContent, dict) and "content" in toolUseContent:
-                # Parse the JSON string in the content field
-                query_json = json.loads(toolUseContent.get("content"))
-                query = query_json.get("query", "")
-                logger.info(f"Extracted KB lookup query")
-
-                # Call the knowledge base lookup
-                results = knowledge_base_lookup.main(query)
-
-        elif tool == "userprofilesearch":
-            if isinstance(toolUseContent, dict) and "content" in toolUseContent:
-                # Parse the JSON string in the content field
-                phone_number_json = json.loads(toolUseContent.get("content"))
-                phone_number = phone_number_json.get("phone_number", "")
-                logger.info(f"Extracted phone number.")
-
-                results = retrieve_user_profile.main(phone_number)
-
+@mcp_server.tool(
+    name="lookup",
+    description="Runs query against a knowledge base to retrieve information."
+)
+async def lookup_tool(
+    query: Annotated[str, Field(description="the query to search")]
+) -> dict:
+    """Look up information in the knowledge base"""
+    try:
+        results = knowledge_base_lookup.main(query)
         return results
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
 ```
+
+2. **Implement the tool logic** in a separate Python file. You can create a new Python file to implement the tool functionality, like how `backend/retrieve_user_profile.py` implements the user lookup tool and `backend/knowledge_base_lookup.py` implements the knowledge base search tool. These examples show how you can interact with AWS resources via these tools to retrieve real information for the model.
+
+3. **Import your tool implementation** in `backend/tools.py`. The tool function should import and call your implementation module:
+
+```python
+import knowledge_base_lookup
+
+# Then call it in your tool function:
+results = knowledge_base_lookup.main(query)
+```
+
+The MCP server handles converting your tool definitions into the proper format for Amazon Nova Sonic and automatically processes tool calls during conversations.
 
 ### Local development
 
