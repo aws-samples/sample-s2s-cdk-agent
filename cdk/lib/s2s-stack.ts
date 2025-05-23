@@ -165,6 +165,7 @@ export class S2SAppStack extends cdk.Stack {
       environment: {
         NODE_ENV: "production",
         PORT: "80",
+        MCP_PORT: "8000",
         USER_POOL_ID: this.userPool.userPoolId,
         CLIENT_ID: this.userPoolClient.userPoolClientId,
       },

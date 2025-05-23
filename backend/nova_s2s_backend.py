@@ -1,18 +1,4 @@
-#
-# Copyright 2025 Amazon.com, Inc. and its affiliates. All Rights Reserved.
-#
-# Licensed under the Amazon Software License (the "License").
-# You may not use this file except in compliance with the License.
-# A copy of the License is located at
-#
-#   http://aws.amazon.com/asl/
-#
-# or in the "license" file accompanying this file. This file is distributed
-# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-# express or implied. See the License for the specific language governing
-# permissions and limitations under the License.
-#
-
+#nova_s2s_backend.py
 import json
 import logging
 import os
@@ -41,8 +27,8 @@ from smithy_aws_core.credentials_resolvers.environment import (
     EnvironmentCredentialsResolver,
 )
 
-import knowledge_base_lookup
-import retrieve_user_profile
+from mcp_server import get_bedrock_tool_specs, handle_bedrock_tool_call, start_mcp_server, mcp_server
+import tools
 
 # Configure logging
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
@@ -123,6 +109,29 @@ class BedrockStreamManager:
             self.is_active = False
             logger.error(f"Failed to initialize stream: {str(e)}")
             raise
+    
+    async def handle_prompt_start_with_tools(self, original_session_data):
+        """Handle session start by adding tool configuration"""
+        
+        # Get the original session start data
+        prompt_config = original_session_data["event"]["promptStart"]
+        
+        # Add tool configuration using MCP tools
+        prompt_config["toolConfiguration"] = {
+            "tools": await get_bedrock_tool_specs()
+        }
+        
+        # Create the enhanced session start event
+        enhanced_prompt_start_event = {
+            "event": {
+                "promptStart": prompt_config
+            }
+        }
+        
+        logger.info("Starting session")
+        
+        # Send the enhanced event to Bedrock
+        await self.send_raw_event(enhanced_prompt_start_event)
 
     async def send_raw_event(self, event_data):
         """Send a raw event to the Bedrock stream."""
@@ -149,6 +158,9 @@ class BedrockStreamManager:
                 event_type = list(event_data.get("event", {}).keys())
             else:
                 event_type = list(json.loads(event_json).get("event", {}).keys())
+
+            if "promptStart" in event_type or 'contentStart' in event_type:
+                logger.info(event_data)
 
             if len(event_json) > 200:
                 if (
@@ -278,7 +290,7 @@ class BedrockStreamManager:
                                         "Processing tool use and sending result"
                                     )
 
-                                    # Process the tool use
+                                    # Process the tool use using the registry
                                     toolResult = await self.processToolUse(
                                         self.toolName, self.toolUseContent
                                     )
@@ -318,11 +330,13 @@ class BedrockStreamManager:
                                         content_json_string = str(toolResult)
 
                                     # check if tool use resulted in an error that needs to be reported to Sonic
-                                    status = (
-                                        "error"
-                                        if toolResult.get("status") == "error"
-                                        else "success"
-                                    )
+                                    if isinstance(toolResult, dict):
+                                        content_json_string = json.dumps(toolResult)
+                                        # Simple error check - only if it's a dict and has a status field
+                                        status = "error" if toolResult.get("status") == "error" else "success"
+                                    else:
+                                        content_json_string = str(toolResult)
+                                        status = "success"
                                     # logger.info(f"Tool result {toolResult} and value of status is {status}")
 
                                     tool_result_event = {
@@ -374,31 +388,15 @@ class BedrockStreamManager:
             self.is_active = False
 
     async def processToolUse(self, toolName, toolUseContent):
-        """Return the tool result"""
-        tool = toolName.lower()
-        results = {}
-
-        if tool == "lookup":
-            # Extract query from toolUseContent
-            if isinstance(toolUseContent, dict) and "content" in toolUseContent:
-                # Parse the JSON string in the content field
-                query_json = json.loads(toolUseContent.get("content"))
-                query = query_json.get("query", "")
-                logger.info(f"Extracted KB lookup query")
-
-                # Call the knowledge base lookup
-                results = knowledge_base_lookup.main(query)
-
-        elif tool == "userprofilesearch":
-            if isinstance(toolUseContent, dict) and "content" in toolUseContent:
-                # Parse the JSON string in the content field
-                phone_number_json = json.loads(toolUseContent.get("content"))
-                phone_number = phone_number_json.get("phone_number", "")
-                logger.info(f"Extracted phone number.")
-
-                results = retrieve_user_profile.main(phone_number)
-
-        return results
+        """Process tool usage using MCP"""
+        tool_name = toolName.lower()
+        
+        logger.info(f"Processing tool use: {tool_name}")
+        
+        # Process the tool
+        result = await handle_bedrock_tool_call(tool_name, toolUseContent)
+        
+        return result
 
 
 async def websocket_handler(websocket, url, headers=None):
@@ -463,7 +461,9 @@ async def websocket_handler(websocket, url, headers=None):
                     if event_type == "promptStart":
                         stream_manager.prompt_name = data["event"]["promptStart"][
                             "promptName"
-                        ]
+                        ]                 
+                        await stream_manager.handle_prompt_start_with_tools(data) # add the tool config
+                        continue 
                     elif (
                         event_type == "contentStart"
                         and data["event"]["contentStart"].get("type") == "AUDIO"
@@ -576,25 +576,46 @@ async def authenticated_handler(websocket, path=None):
 
 
 async def main():
-    """Main function to run the WebSocket server."""
-    # Get port from environment variable or use default
+    """Main function to run the WebSocket server and MCP server."""
+    mcp_port = int(os.environ.get("MCP_PORT", 8000)) # communicate with MCP on port 80, localhost
+    
+    # Start MCP server and wait for it to be ready
+    logger.info(f"Starting MCP server on localhost:{mcp_port}")
+    mcp_task = asyncio.create_task(start_mcp_server(host="127.0.0.1", port=mcp_port))
+    
+    # Wait for MCP server to be ready
+    await asyncio.sleep(2)
+    
+    # Verify MCP server is working
+    try:
+        tools = await mcp_server.get_tools()
+        tools_list = list(tools.values())  # Convert dict to list for len()
+        logger.info(f"MCP server ready with {len(tools_list)} tools: {list(tools.keys())}")
+    except Exception as e:
+        logger.error(f"MCP server failed to start: {e}")
+        mcp_task.cancel()
+        raise
+    
+    # Now start WebSocket server
     port = int(os.environ.get("PORT", 80))
-
-    # Use 0.0.0.0 to listen on all interfaces (required for containers)
     host = "0.0.0.0"
-
-    # Start WebSocket server with the simplified handler
-    # The handler now works with legacy and newer websockets versions
+    
     logger.info(f"Starting WebSocket server on {host}:{port}")
-
+    
     try:
         async with websockets.serve(authenticated_handler, host, port):
-            logger.info(f"WebSocket server started {host}:{port}")
-            # Keep the server running forever
-            await asyncio.Future()
+            logger.info(f"All services running - WebSocket: {port}, MCP: {mcp_port}")
+            await asyncio.Future()  
     except Exception as e:
         logger.error(f"Server startup error: {e}", exc_info=True)
-
+        raise
+    finally:
+        logger.info("Shutting down...")
+        mcp_task.cancel()
+        try:
+            await mcp_task
+        except asyncio.CancelledError:
+            pass
 
 if __name__ == "__main__":
     # Run the main function
