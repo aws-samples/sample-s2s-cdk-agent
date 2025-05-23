@@ -177,6 +177,8 @@ The MCP server handles converting your tool definitions into the proper format f
 
 Assume credentials for an AWS account with Amazon Nova Sonic enabled in Amazon Bedrock and export: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN`.
 
+Make sure your `.env` file is in the backend folder.
+
 Run `npm run dev` in the same shell session as above to start frontend and backend containers.
 Both use a file watching mechanism to be notified of local code changes and reload automatically.
 Re-run the `npm` command only if changes are made to the Dockerfile, Python libraries or NPM dependencies that require installation, as these are not picked up by the file watcher.
