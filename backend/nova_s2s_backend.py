@@ -43,7 +43,7 @@ from smithy_aws_core.credentials_resolvers.environment import (
 )
 
 from mcp_server import get_bedrock_tool_specs, handle_bedrock_tool_call, start_mcp_server, mcp_server
-import tools
+import industries.airline.tools.tools
 
 # Configure logging
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()

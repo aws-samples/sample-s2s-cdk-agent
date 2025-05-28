@@ -29,9 +29,12 @@ let uiInitialized = false; // Track if UI has been initialized
 
 // Initialize on page load
 document.addEventListener("DOMContentLoaded", async () => {
+  // Initialize Cognito authentication first
+  cognitoAuth = getCognitoAuth();
+
+  // Handle authentication before initializing the app
   try {
-    // Attempt authentication
-    const isAuthenticated = await doCognitoAuthentication();
+    const isAuthenticated = await cognitoAuth.handleAuth();
 
     if (isAuthenticated) {
       // Create HTML structure if not already created
@@ -136,19 +139,6 @@ function showSaveConfirmation() {
   }
 }
 
-// Handle authentication process
-async function doCognitoAuthentication() {
-  // Bypass authentication in development mode
-  if (import.meta.env.DEV) {
-    console.log("Running in local development mode, bypassing authentication.");
-    return true;
-  }
-
-  cognitoAuth = getCognitoAuth();
-  const isAuthenticated = await cognitoAuth.handleAuth();
-  return isAuthenticated;
-}
-
 // Logout function
 function handleLogout() {
   if (cognitoAuth) {
@@ -224,12 +214,14 @@ function togglePromptEditor() {
 
 // Update status indicator
 function updateStatus(message, status) {
-  const statusElement = document.getElementById("status");
-  if (statusElement) {
-    statusElement.textContent = message;
-    statusElement.className = status;
+  const statusIcon = document.querySelector(".status-icon");
+  if (statusIcon) {
+    statusIcon.className = "fas fa-circle status-icon " + status;
+    
+    // Add tooltip with status message
+    statusIcon.setAttribute("title", message);
   } else {
-    console.error("Status element not found");
+    console.error("Status icon element not found");
   }
 }
 
@@ -255,8 +247,8 @@ async function startStreaming() {
   const startButton = document.getElementById("start");
   const stopButton = document.getElementById("stop");
 
-  if (startButton) startButton.disabled = true;
-  if (stopButton) stopButton.disabled = false;
+  if (startButton) startButton.style.display = "none";
+  if (stopButton) stopButton.style.display = "flex";
 
   isRecording = true;
   updateStatus("Connected", "connected");
@@ -421,8 +413,8 @@ function stopStreaming() {
   }
 
   // Update UI
-  if (startButton) startButton.disabled = false;
-  if (stopButton) stopButton.disabled = true;
+  if (startButton) startButton.style.display = "flex";
+  if (stopButton) stopButton.style.display = "none";
 
   isRecording = false;
   updateStatus("Disconnected", "disconnected");
@@ -476,7 +468,7 @@ async function updateTranscript(history) {
         const text = match[2];
 
         // Add emotion as a prefix
-        messageText = `[${emotion}]${text}`;
+        messageText = `Agent: ${text}`;
       }
     }
 
@@ -515,50 +507,71 @@ function handleAudioReceived(audioData) {
 // Creates the HTML structure for the interface
 function createHtmlStructure() {
   document.body.innerHTML = `
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <div id="app">
       <div class="header">
-        <h1>Call Center Assistant Playground</h1>
-        <div class="header-controls">
-          <div class="timer-container">
-            <div class="timer-icon">🕐</div>
-            <span id="timer">0:00</span>
-          </div>
-          <div id="status" class="disconnected">Disconnected</div>
-          <div class="button-container">
-            <button id="logout-button" class="button">Logout</button>
-            <button id="show-prompt-button" class="button">Show Prompt</button>
-            <button id="start" class="button">Start Session</button>
-            <button id="stop" class="button" disabled>Stop Session</button>
+        <div class="logo-container">
+          <img src="customer-logo.jpg" alt="Logo" class="logo-image" />
+          <div class="title-container">
+            <h1 class="app-title">Digital Concierge Demo</h1>
+            <div class="powered-by">Powered by Amazon Nova Sonic</div>
           </div>
         </div>
+        
+        <div class="header-right">
+          <div class="timer-container">
+            <span id="timer">0:00</span>
+          </div>
+          <div id="status-indicator">
+            <i class="fas fa-circle status-icon disconnected"></i>
+          </div>
+          <button id="show-prompt-button" class="icon-button" aria-label="Show system prompt">
+            <i class="fas fa-cog"></i>
+          </button>
+          <button id="logout-button" class="icon-button" aria-label="Logout">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
       </div>
-
+      
       <!-- System Prompt Editor (initially hidden) -->
       <div id="system-prompt-container" style="display: none;">
         <h2>System Prompt Editor</h2>
         <div id="save-confirmation" style="display: none;">Saved!</div>
         <div class="editor-container">
-          <textarea
-            id="system-prompt-textarea"
+          <textarea 
+            id="system-prompt-textarea" 
             class="system-prompt-textarea"
             placeholder="Enter system prompt here..."
           ></textarea>
           <div class="prompt-controls">
-            <button id="save-prompt-button" class="button">Save Prompt</button>
+            <button id="save-prompt-button" class="button">Save</button>
           </div>
         </div>
       </div>
-
+      
       <div id="chat-container"></div>
-
-      <div id="controls">
-        <!-- Controls moved to header area -->
+      
+      <div class="mic-container">
+        <button id="start" class="mic-button" aria-label="Start recording">
+          <i class="fas fa-microphone"></i>
+        </button>
+        <button id="stop" class="mic-button" style="display: none;" aria-label="Stop recording">
+          <i class="fas fa-microphone-slash"></i>
+        </button>
       </div>
-
+      
       <div class="footer">
-        <div>Voice Chat Interface v1.0</div>
+        <div>Digital Concierge Demo v1.0</div>
       </div>
     </div>
+    
+    <style>
+    </style>
   `;
 
   // Ensure audio context is resumed after user interaction

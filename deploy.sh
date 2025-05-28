@@ -39,7 +39,10 @@ npm install
 # 2. Install frontend dependencies
 echo -e "${GREEN}Installing frontend dependencies and building the asset...${NC}"
 cp ./config/system_prompt.txt ./frontend/public
+cp ./config/customer-logo.jpg ./frontend/public
+
 npm run build:frontend
+
 cp .env ./backend/
 
 echo -e "${GREEN}Deploying the CDK stacks...${NC}"
