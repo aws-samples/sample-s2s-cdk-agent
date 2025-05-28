@@ -1,0 +1,39 @@
+appliance_type,model,issue,solution,document_link
+Fridge,Dometic RMD 8555,"Not cooling properly","1. Check power source is connected properly
+2. Ensure the fridge is level
+3. Check ventilation is not blocked
+4. Try switching between power sources (gas/electric)
+5. Allow 24 hours for initial cooling",https://thl-support.com/docs/fridge-dometic-rmd8555.pdf
+Fridge,Dometic RMD 8551,"Not cooling properly","1. Check power source is connected properly
+2. Ensure the fridge is level
+3. Check ventilation is not blocked
+4. Try switching between power sources (gas/electric)
+5. Allow 24 hours for initial cooling",https://thl-support.com/docs/fridge-dometic-rmd8551.pdf
+Fridge,Waeco CRX-50,"Not cooling properly","1. Check power connection
+2. Ensure temperature setting is correct
+3. Check ventilation is not blocked
+4. Allow several hours for initial cooling",https://thl-support.com/docs/fridge-waeco-crx50.pdf
+Fridge,Waeco CRX-65,"Not cooling properly","1. Check power connection
+2. Ensure temperature setting is correct
+3. Check ventilation is not blocked
+4. Allow several hours for initial cooling",https://thl-support.com/docs/fridge-waeco-crx65.pdf
+Stove,Dometic 3-Burner,"Won't ignite","1. Check gas bottle is turned on
+2. Ensure gas isolation valve is open
+3. Try manual ignition with lighter
+4. Check for blocked burners",https://thl-support.com/docs/stove-dometic-3burner.pdf
+Stove,Dometic 2-Burner,"Won't ignite","1. Check gas bottle is turned on
+2. Ensure gas isolation valve is open
+3. Try manual ignition with lighter
+4. Check for blocked burners",https://thl-support.com/docs/stove-dometic-2burner.pdf
+Heater,Truma Combi 6E,"Not heating","1. Check power/gas supply
+2. Verify temperature setting
+3. Check for error codes on control panel
+4. Reset by turning off for 10 minutes",https://thl-support.com/docs/heater-truma-combi6e.pdf
+Heater,Truma Combi 4E,"Not heating","1. Check power/gas supply
+2. Verify temperature setting
+3. Check for error codes on control panel
+4. Reset by turning off for 10 minutes",https://thl-support.com/docs/heater-truma-combi4e.pdf
+Heater,Webasto Air Top 2000,"Not heating","1. Check fuel level
+2. Check power connection
+3. Look for error codes (blinking light pattern)
+4. Reset by disconnecting power for 30 seconds",https://thl-support.com/docs/heater-webasto-airtop2000.pdf

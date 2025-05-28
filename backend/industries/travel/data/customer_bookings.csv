@@ -1,0 +1,11 @@
+contact_phone,booking_ref,accomodation_id,accomodation_name,accomodation_location,customer_name,customer_email,vehicle_reg,vehicle_model,trip_start,trip_end,itinerary
+0211234567,BK001,ACC001,Lakeside Holiday Park,Queenstown,Sarah Johnson,sarah.j@example.com,ABC123,Maui Cascade,2025-06-10,2025-06-17,"Auckland,Rotorua,Taupo,Queenstown"
+0221234568,BK002,ACC004,Forest Retreat,Rotorua,Michael Chen,michael.c@example.com,DEF456,Britz Voyager,2025-06-15,2025-06-22,"Christchurch,Lake Tekapo,Wanaka,Rotorua"
+0231234569,BK003,ACC008,Coastal Campground,Napier,Emma Williams,emma.w@example.com,GHI789,Maui Beach,2025-06-12,2025-06-19,"Wellington,Napier,Taupo,Rotorua"
+0241234570,BK004,ACC006,Alpine Haven,Mt Cook,David Smith,david.s@example.com,JKL012,Britz Explorer,2025-06-20,2025-06-27,"Queenstown,Wanaka,Mt Cook,Christchurch"
+0251234571,BK005,ACC005,Beachfront Paradise,Coromandel,Lisa Brown,lisa.b@example.com,MNO345,Maui River,2025-06-18,2025-06-25,"Auckland,Coromandel,Tauranga,Rotorua"
+0261234572,BK006,ACC009,Auckland City Campground,Auckland,James Wilson,james.w@example.com,ABC123,Britz Discovery,2025-06-22,2025-06-29,"Auckland,Waitomo,Rotorua,Taupo"
+0271234573,BK007,ACC016,Glacier View Park,Franz Josef,Olivia Taylor,olivia.t@example.com,DEF456,Maui Alpine,2025-06-25,2025-07-02,"Christchurch,Arthur's Pass,Franz Josef,Queenstown"
+0281234574,BK008,ACC011,Milford Sound Lodge,Milford Sound,Daniel Lee,daniel.l@example.com,GHI789,Britz Frontier,2025-06-28,2025-07-05,"Queenstown,Te Anau,Milford Sound,Wanaka"
+0291234575,BK009,ACC022,Aoraki Stargazing Camp,Lake Tekapo,Sophia Garcia,sophia.g@example.com,JKL012,Maui Stellar,2025-07-01,2025-07-08,"Christchurch,Lake Tekapo,Mt Cook,Queenstown"
+0201234576,BK010,ACC014,Hobbiton Meadows,Matamata,Ethan Robinson,ethan.r@example.com,MNO345,Britz Journey,2025-07-05,2025-07-12,"Auckland,Hamilton,Matamata,Rotorua"
