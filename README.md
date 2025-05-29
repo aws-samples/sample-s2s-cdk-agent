@@ -185,6 +185,10 @@ Re-run the `npm` command only if changes are made to the Dockerfile, Python libr
 
 The frontend is accessible at http://localhost:5173/ and the backend at http://localhost:8080/, with authentication disabled for both.
 
+### Industry specific deployment 
+
+Project contains a folder industry-specific-demo-data which contains tools and demo data to allow you to quickly setup demos for a specific industry. We hope that this list will grow with the open source community participation. As part of the deployment process (./deploy.sh) you will be prompted with option to choose the industry (airline, telco, etc.). You will be also prompted to import sample data. 
+
 ## FAQ/trouble shooting
 
 1. I get `ERROR: process "/bin/sh -c chmod +x entrypoint.sh" did not complete successfully: exit code: 255` during build time.

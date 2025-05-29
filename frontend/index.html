@@ -20,14 +20,53 @@ permissions and limitations under the License.
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Amazon Nova Voice Assistant Demo</title>
+    <title>Amazon Nova Speech-to-Speech Voice Assistant Playground</title>
     <link rel="stylesheet" href="/src/style.css" />
     <link rel="stylesheet" href="/src/system-prompt-editor.css" />
     <script src="config.js"></script>
   </head>
   <body>
     <div id="app">
+      <div class="header">
+        <h1>Call Center Assistant Playground</h1>
+        <div class="header-controls">
+          <div class="timer-container">
+            <div class="timer-icon">🕐</div>
+            <span id="timer">0:00</span>
+          </div>
+          <div id="status" class="disconnected">Disconnected</div>
+          <div class="button-container">
+            <button id="logout-button" class="button">Logout</button>
+            <button id="show-prompt-button" class="button">Show Prompt</button>
+            <button id="start" class="button">Start Session</button>
+            <button id="stop" class="button" disabled>Stop Session</button>
+          </div>
+        </div>
+      </div>
 
+      <!-- System Prompt Editor (initially hidden) -->
+      <div id="system-prompt-container" style="display: none">
+        <h2>System Prompt Editor</h2>
+        <div id="save-confirmation" style="display: none">Saved!</div>
+        <div class="editor-container">
+          <textarea
+            id="system-prompt-textarea"
+            class="system-prompt-textarea"
+            placeholder="Enter system prompt here..."
+          ></textarea>
+          <div class="prompt-controls">
+            <button id="save-prompt-button" class="button">Save Prompt</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="chat-container">
+        <!-- Conversation messages will appear here -->
+      </div>
+
+      <div class="footer">
+        <div>Voice Chat Interface v1.0</div>
+      </div>
     </div>
     <script type="module" src="/src/main.js"></script>
   </body>
