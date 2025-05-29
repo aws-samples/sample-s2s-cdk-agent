@@ -19,10 +19,7 @@ from pydantic import Field
 from mcp_server import mcp_server
 import logging
 from . import knowledge_base_lookup
-from . import user_profile_by_booking_reference
-from . import user_profile_by_customer_id
-from . import create_support_ticket
-from . import request_for_special_meal
+from . import retrieve_user_profile
 
 logger = logging.getLogger(__name__)
 
@@ -43,79 +40,20 @@ async def lookup_tool(
         logger.error(f"Error in knowledge base lookup: {str(e)}", exc_info=True)
         return {"status": "error", "error": str(e)}
 
-
-# User Profile Search Tool by Booking Reference
+# User Profile Search Tool
 @mcp_server.tool(
-    name="userProfileByBookingReference",
-    description="Search for a user's flight booking information using their booking reference"
+    name="userProfileSearch",
+    description="Search for a user's account and phone plan information by phone number"
 )
-async def user_profile_by_booking_reference_tool(
-    booking_reference: Annotated[Union[int, str], Field(description="the user's booking reference in format GCI7NE")]
+async def user_profile_search_tool(
+    phone_number: Annotated[Union[int, str], Field(description="the user's phone number")]
 ) -> dict:
-    """Search for user flight booking information by booking reference"""
+    """Search for user profile and account information"""
     try:
-        logger.info(f"User profile search by booking reference: {booking_reference}")
-        results = user_profile_by_booking_reference.main(booking_reference)
+        phone_str = str(phone_number)
+        logger.info(f"User profile search for: {phone_str}")
+        results = retrieve_user_profile.main(phone_str)
         return results  
     except Exception as e:
-        logger.error(f"Error in user profile search by booking reference: {str(e)}", exc_info=True)
+        logger.error(f"Error in user profile search: {str(e)}", exc_info=True)
         return {"status": "error", "error": str(e)}
-
-# User Profile Search Tool by Customer ID
-@mcp_server.tool(
-    name="userProfileByCustomerId",
-    description="Search for a user's flight booking information using their customer ID"
-)
-async def user_profile_by_customer_id_tool(
-    customer_id: Annotated[Union[int, str], Field(description="the user's customer ID")]
-    # phone_number: Annotated[Union[int, str], Field(description="the user's phone number")]
-
-) -> dict:
-    """Search for user flight booking information by customer ID"""
-    try:
-        logger.info(f"User profile search by customer ID: {customer_id}")
-        results = user_profile_by_customer_id.main(customer_id)
-        return results  
-    except Exception as e:
-        logger.error(f"Error in user profile search by customer ID: {str(e)}", exc_info=True)
-        return {"status": "error", "error": str(e)}
-
-# Create a support ticket
-@mcp_server.tool(
-    name="createSupportTicket",
-    description="Creates a support ticket by logging the details of the customer issue"
-)
-async def create_support_ticket_tool(
-    issue_summary: Annotated[Union[str], Field(description="A summary of the issue raised by the user")],
-    booking_reference: Annotated[Union[str], Field(description="The booking reference to associate with the support ticket in format KYH7BH")]
-) -> dict:
-    """create a support ticket for for a specific flight with provided booking ref"""
-    try:
-        logger.info(f"User profile search by booking ref: {booking_reference}")
-        results = create_support_ticket.main(issue_summary, booking_reference)
-        return results  
-    except Exception as e:
-        logger.error(f"Error locating records with provided booking reference: {str(e)}", exc_info=True)
-        return {"status": "error", "error": str(e)}
-
-# Take a request for a special meal
-@mcp_server.tool(
-    name="requestForSpecialMeal",
-    description="Use this tool when a user wants to request a special meal for their flight or request for a change in the meal already ordered."
-)
-async def request_for_special_meal_tool(
-    booking_reference: Annotated[Union[str], Field(description="The booking reference to associate with the support ticket in format KYH7BH")],
-    meal_type: Annotated[Union[str], Field(description="The type of special meal requested. Options are vegetarian, halal, fruit salad.")],
-    
-) -> dict:
-    """Use this tool when a user wants to request a special meal for their flight or request for a change in the meal already ordered."""
-    try:
-        logger.info(f"Creating special meal request for booking reference number : {booking_reference}")
-        results = request_for_special_meal.main(booking_reference, meal_type)
-        return results  
-    except Exception as e:
-        logger.error(f"Error locating records with provided booking reference: {str(e)}", exc_info=True)
-        return {"status": "error", "error": str(e)}
-
-
-
