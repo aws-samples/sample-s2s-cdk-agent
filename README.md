@@ -1,6 +1,10 @@
 # Amazon Nova Sonic Call Center Agent w/ Tools
 
-By Reilly Manton (rcmanton@amazon.com); Shuto Araki (shuaraki@amazon.com); Andrew Young (ajuny@amazon.com)
+Authors:
+Reilly Manton (rcmanton@amazon.com)
+Shuto Araki (shuaraki@amazon.com)
+Andrew Young (ajuny@amazon.com)
+Ratan Kumar (ratannz@amazon.com)
 
 This template provides an AWS cloud-based solution for deploying applications that interact with the Amazon Nova Sonic Model. It serves as a foundation for developing future speech-to-speech tooling use cases. Unlike previous implementations that required locally hosted backend and frontend, this cloud architecture leverages:
 
