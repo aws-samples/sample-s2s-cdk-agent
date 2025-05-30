@@ -103,12 +103,16 @@ def lookup_phone_number(phone_number: str):
             raise RuntimeError(f"DynamoDB error: {error_message}")
 
     except ConnectionError as e:
-        logger.error(f"Network error connecting to AWS: {str(e)}")
-        raise ConnectionError(f"Network error connecting to AWS: {str(e)}")
+        error_message = e.response["Error"]["Message"]
+
+        logger.error(f"Network error connecting to AWS: {error_message}")
+        raise ConnectionError(f"Network error connecting to AWS: {error_message}")
 
     except Exception as e:
-        logger.error(f"Unexpected error querying DynamoDB: {str(e)}")
-        raise RuntimeError(f"Error querying DynamoDB: {str(e)}")
+        error_message = e.response["Error"]["Message"]
+
+        logger.error(f"Unexpected error querying DynamoDB: {error_message}")
+        raise RuntimeError(f"Error querying DynamoDB: {error_message}")
 
 
 def main(phone_number: str):

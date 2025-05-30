@@ -112,8 +112,8 @@ export class S2SAppStack extends cdk.Stack {
       effect: iam.Effect.ALLOW,
       actions: ["dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Scan", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem"],
       resources: [
-        `arn:aws:dynamodb:${this.region}:${this.account}:table/*`,
-        `arn:aws:dynamodb:${this.region}:${this.account}:table/*/index/*`,
+        `arn:aws:dynamodb:${this.region}:${this.account}:table/${dynamoDbTableName}`,
+        `arn:aws:dynamodb:${this.region}:${this.account}:table/${dynamoDbTableName}/index/*`,
       ],
     });
 

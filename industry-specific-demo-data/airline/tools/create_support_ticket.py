@@ -148,7 +148,7 @@ def create_ticket(issue_summary, booking_reference, retry=False, session=None):
                     ReturnValues="UPDATED_NEW"
                 )
                 
-                logger.info(f"Support ticket added to existing record: {json.dumps(update_response)}")
+                # logger.info(f"Support ticket added to existing record: {json.dumps(update_response)}")
             else:
                 logger.error(f"No booking found with reference: {booking_reference}")
                 return {
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     booking_referece = sys.argv[1]
     issue_summary = sys.argv[2]
     result = main(issue_summary, booking_referece)
-    print(json.dumps(result, indent=2))
+    # print(json.dumps(result, indent=2))
     sys.exit(0 if result and result.get("status") == "success" else 1)
 
 

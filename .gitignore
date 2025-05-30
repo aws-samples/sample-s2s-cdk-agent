@@ -3,6 +3,8 @@ cdk.context.json
 .roo
 frontend/config.js
 
+backend/tools/*
+
 # Created by https://www.toptal.com/developers/gitignore/api/python,macos,visualstudiocode,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,macos,visualstudiocode,node
 
@@ -115,6 +117,8 @@ web_modules/
 .yarn-integrity
 
 # dotenv environment variable files
+**/.env
+**/*.env
 .env
 .env.development.local
 .env.test.local

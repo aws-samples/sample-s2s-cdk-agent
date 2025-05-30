@@ -65,7 +65,7 @@ echo -e "${GREEN}Setting up demo for $selected_industry industry...${NC}"
 
 # 0. Copy industry specific .env file
 echo -e "${RED}Copy .env file to backend...${NC}"
-cp -r "./.env" "./backend/"
+cp -r "./industry-specific-demo-data/$selected_industry/.env" "./backend/"
 
 # Remove existing tools directory if it exists
 if [ -d "./backend/tools" ]; then
@@ -75,7 +75,7 @@ fi
 
 # Copy industry-specific tools to backend
 echo -e "${YELLOW}Copying $selected_industry tools to backend...${NC}"
-echo -e "cp -r "./industry-specific-demo-data/$selected_industry/tools" "./backend/""
+# echo -e "cp -r "./industry-specific-demo-data/$selected_industry/tools" "./backend/""
 cp -r "./industry-specific-demo-data/$selected_industry/tools" "./backend/"
 echo -e "${GREEN}Successfully copied $selected_industry tools to backend.${NC}"
 

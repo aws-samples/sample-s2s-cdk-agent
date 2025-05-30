@@ -97,7 +97,8 @@ def search_by_customer_id(customer_id: str, retry: bool = False, session=None):
             KeyConditionExpression=Key('customerId').eq(search_value)
         )
 
-        logger.info(f"Query result: {json.dumps(response)}")
+        # log the response. uncomment it for debugging. 
+        # logger.info(f"Query result: {json.dumps(response)}")
 
         if response['Count'] > 0:
             now = datetime.now()

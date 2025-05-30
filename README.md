@@ -1,10 +1,7 @@
 # Amazon Nova Sonic Call Center Agent w/ Tools
 
 Authors:
-Reilly Manton (rcmanton@amazon.com)
-Shuto Araki (shuaraki@amazon.com)
-Andrew Young (ajuny@amazon.com)
-Ratan Kumar (ratannz@amazon.com)
+Reilly Manton (rcmanton@amazon.com), Shuto Araki (shuaraki@amazon.com), Andrew Young (ajuny@amazon.com), Ratan Kumar (ratannz@amazon.com)
 
 This template provides an AWS cloud-based solution for deploying applications that interact with the Amazon Nova Sonic Model. It serves as a foundation for developing future speech-to-speech tooling use cases. Unlike previous implementations that required locally hosted backend and frontend, this cloud architecture leverages:
 
@@ -65,15 +62,11 @@ The versions below are tested and validated. Minor version differences would lik
 
 ### Deployment
 
-1. [Optional] Update the environment variables to point to your Amazon Dynamodb table and your Bedrock Knowledge Base
+1. go to industry-specific-demo-data, select the industry of your choice if available, else select other for generic implementation. 
 
-You can skip this section if you don't intend to use these tools or build your own with a simple interaction with Amazon Nova Sonic.
+Copy `template.env` from the selecte folder to a new file `.env` and update the `KNOWLEDGE_BASE_ID` and `DYNAMODB_TABLE_NAME`. If you want to bring your own VPC rather than the solution deploying a new VPC for you, specify your VPC ID in `VPC_ID`.
 
-Copy `template.env` to a new file `.env` and update the `KNOWLEDGE_BASE_ID` and `DYNAMODB_TABLE_NAME` to your knowledge base ID and your table name. For table structure, the tool expects `phone_number` (S) as the primary key (assuming telecom call center use case) and you can add any other keys you want. (e.g., "plan", "current_bill", etc.) Ask about those attributes in the chat to confirm the profile search tool is working. Knowledge base can be loaded with your own contact center guideline texts as needed.
-
-We may add a separate construct to create those resources through CDK if there is enough demand. Let us know by raising an issue.
-
-If you want to bring your own VPC rather than the solution deploying a new VPC for you, specify your VPC ID in `VPC_ID`.
+** Note that deployment script will automatically copy this file into project's backend folder. 
 
 2. Ensure you are deploying to aws region `us-east-1` since this is the only region that currently supports Amazon Nova Sonic model in Amazon Bedrock.
 
@@ -142,7 +135,7 @@ Tooling for Amazon Nova Sonic is implemented using the Model Context Protocol (M
 
 To add a new tool:
 
-1. **Define the tool using MCP decorators** in `backend/tools.py`.
+1. **Define the tool using MCP decorators** in `backend/mcp_tool_registry.py`.
 
 Tools are defined using the `@mcp_server.tool()` decorator with explicit type annotations. The MCP server automatically generates the tool specifications that get sent to Amazon Nova Sonic. Give your tool a name, description, and specify the input parameters with types. The model uses the description to know when to use the tool and the parameter descriptions to understand the input format.
 
@@ -191,7 +184,25 @@ The frontend is accessible at http://localhost:5173/ and the backend at http://l
 
 ### Industry specific deployment 
 
-Project contains a folder industry-specific-demo-data which contains tools and demo data to allow you to quickly setup demos for a specific industry. We hope that this list will grow with the open source community participation. As part of the deployment process (./deploy.sh) you will be prompted with option to choose the industry (airline, telco, etc.). You will be also prompted to import sample data. 
+The project contains a folder `industry-specific-demo-data` which contains tools and demo data to allow you to quickly set up demos for specific industries. We hope that this list will grow with open source community participation.
+
+#### Deploying an industry-specific demo
+
+1. **Before deployment**: 
+   - Navigate to the `industry-specific-demo-data` directory and find your preferred industry folder
+   - Copy the `template.env` file from your chosen industry folder to the `backend` folder and rename it to `.env`
+   - Update the values inside the `.env` file with your specific resource information (e.g., knowledge base IDs, DynamoDB table names)
+
+2. **During deployment**:
+   - When running `./deploy.sh`, you will be prompted to choose an industry (airline, telco, etc.)
+   - You will also be prompted to import sample data for that industry
+   - If your preferred industry is not available in the `industry-specific-demo-data` directory, select "other" for a generic voice bot deployment
+
+3. **Custom industry setup**:
+   - If using "other", you'll need to configure your own tools and knowledge base
+   - Follow the tooling customization guidelines in the [Tooling](#tooling) section
+
+This approach allows you to quickly deploy industry-tailored demos with appropriate prompts, tools, and sample data already configured.
 
 ## FAQ/trouble shooting
 
