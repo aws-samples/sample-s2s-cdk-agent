@@ -13,7 +13,6 @@
 # permissions and limitations under the License.
 #
 
-# mcp_server.py
 import asyncio
 import json
 import logging

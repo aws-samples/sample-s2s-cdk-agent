@@ -13,13 +13,12 @@
 # permissions and limitations under the License.
 #
 
-# tools.py
+# mcp_tool_registry.py
 from typing import Annotated, Union
 from pydantic import Field
 from mcp_server import mcp_server
 import logging
-import knowledge_base_lookup
-import retrieve_user_profile
+from . import knowledge_base_lookup
 
 logger = logging.getLogger(__name__)
 
@@ -38,22 +37,4 @@ async def lookup_tool(
         return results  
     except Exception as e:
         logger.error(f"Error in knowledge base lookup: {str(e)}", exc_info=True)
-        return {"status": "error", "error": str(e)}
-
-# User Profile Search Tool
-@mcp_server.tool(
-    name="userProfileSearch",
-    description="Search for a user's account and phone plan information by phone number"
-)
-async def user_profile_search_tool(
-    phone_number: Annotated[Union[int, str], Field(description="the user's phone number")]
-) -> dict:
-    """Search for user profile and account information"""
-    try:
-        phone_str = str(phone_number)
-        logger.info(f"User profile search for: {phone_str}")
-        results = retrieve_user_profile.main(phone_str)
-        return results  
-    except Exception as e:
-        logger.error(f"Error in user profile search: {str(e)}", exc_info=True)
         return {"status": "error", "error": str(e)}

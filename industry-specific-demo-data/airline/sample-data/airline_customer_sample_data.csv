@@ -1,0 +1,29 @@
+frequentFlyerNumber,bookingReference,arrivalAirport,departureAirport,departureDate,departureTime,emailID,flightNumber,fullName,mealSelected,seatNumber
+7642035,DUA4VV,BNE,WLG,2025-06-03,15:03,joe.bloggs@example.com,NZ764,Joe Bloggs,Vegetarian,11A
+7642035,STA6NI,PER,ADL,2025-06-11,21:16,joe.bloggs@example.com,NZ577,Joe Bloggs,Vegan,23C
+7642035,QBU6KJ,WLG,BNE,2025-06-10,18:03,joe.bloggs@example.com,NZ101,Joe Bloggs,,12A
+7642035,GCI7NE,ADL,PER,2025-06-18,09:59,joe.bloggs@example.com,NZ202,Joe Bloggs,Vegan,15C
+9834721,VDZ3JS,SYD,MEL,2025-06-02,11:29,jane.doe@example.com,NZ101,Jane Doe,Vegetarian,12A
+9834721,WJW3SH,MEL,BNE,2025-06-08,17:32,jane.doe@example.com,NZ334,Jane Doe,,17A
+9834721,BLA5JN,BNE,MEL,2025-06-18,07:47,jane.doe@example.com,NZ202,Jane Doe,,15C
+9834721,VES1SK,MEL,SYD,2025-06-07,05:23,jane.doe@example.com,NZ241,Jane Doe,,18C
+1357268,BLZ3DX,PER,BNE,2025-06-09,14:58,john.smith@example.com,NZ422,John Smith,Vegetarian,28C
+1357268,RBA4XR,BNE,MEL,2025-06-17,20:44,john.smith@example.com,NZ202,John Smith,Vegetarian,15C
+1357268,ELP3RF,BNE,PER,2025-06-16,11:41,john.smith@example.com,NZ101,John Smith,,12A
+1357268,GPH9NX,MEL,BNE,2025-06-25,22:41,john.smith@example.com,NZ463,John Smith,Vegetarian,17C
+4697384,KQS2NY,BNE,CHC,2025-06-03,06:53,emily.doe@example.com,NZ499,Emily Doe,Gluten Free,18A
+4697384,LOE7VA,AKL,ADL,2025-06-12,11:17,emily.doe@example.com,NZ205,Emily Doe,,10C
+4697384,EVI8LI,CHC,BNE,2025-06-11,12:36,emily.doe@example.com,NZ101,Emily Doe,Vegetarian,12A
+4697384,ITH3ZO,ADL,AKL,2025-06-19,21:38,emily.doe@example.com,NZ202,Emily Doe,,15C
+7325940,LEW0UI,AKL,MEL,2025-06-05,19:28,sarah.bloggs@example.com,NZ202,Sarah Bloggs,,15C
+7325940,TAQ6VX,AKL,SYD,2025-06-14,05:47,sarah.bloggs@example.com,NZ101,Sarah Bloggs,Halal,12A
+7325940,QXQ9IB,SYD,AKL,2025-06-18,14:38,sarah.bloggs@example.com,NZ412,Sarah Bloggs,,14B
+7325940,NKR9HN,MEL,AKL,2025-06-13,10:12,sarah.bloggs@example.com,NZ530,Sarah Bloggs,,27B
+8813347,SNJ3KL,ADL,WLG,2025-06-02,19:39,tom.bloggs@example.com,NZ549,Tom Bloggs,Gluten Free,19B
+8813347,CMX4RE,WLG,ADL,2025-06-10,22:55,tom.bloggs@example.com,NZ202,Tom Bloggs,Vegetarian,15C
+8813347,RMB7QD,AKL,ADL,2025-06-11,14:54,tom.bloggs@example.com,NZ101,Tom Bloggs,Vegetarian,12A
+8813347,GEJ5OX,CHC,BNE,2025-06-13,08:35,tom.bloggs@example.com,NZ806,Tom Bloggs,Vegetarian,26C
+5021349,UPS3BY,WLG,BNE,2025-05-31,09:31,mike.bloggs@example.com,NZ470,Mike Bloggs,,21B
+5021349,AOJ2RH,BNE,WLG,2025-06-06,09:10,mike.bloggs@example.com,NZ101,Mike Bloggs,,12A
+5021349,KBV5SP,CHC,MEL,2025-06-07,09:33,mike.bloggs@example.com,NZ202,Mike Bloggs,,15C
+5021349,DIG6EZ,MEL,CHC,2025-06-14,10:40,mike.bloggs@example.com,NZ152,Mike Bloggs,,28B
