@@ -23,13 +23,8 @@ The airline demo includes:
    - `VPC_ID`: (Optional) Your VPC ID if you want to use an existing VPC
    - `KNOWLEDGE_BASE_ID`: Your Amazon Bedrock Knowledge Base ID containing airline FAQs and policies
    - `DYNAMODB_TABLE_NAME`: Your DynamoDB table name for customer data
-   - `AMADEUS_API_KEY`: Your Amadeus API key (required for flight search functionality)
-   - `AMADEUS_API_SECRET`: Your Amadeus API secret (required for flight search functionality)
 
-3. Copy the `.env` file to the backend folder:
-   ```bash
-   cp .env ../../backend/
-   ```
+3. `.env` will be automatically copied to backend folder by the deployment script.
 
 ### 2. Sample Data Import
 
@@ -54,24 +49,12 @@ To import this sample data to your DynamoDB table:
    python import_data_to_dynamodb.py
    ```
 
-### 3. Flight Search Tool
-
-The flight search tool uses the Amadeus API to provide real flight information. If you don't have Amadeus API credentials:
-
-- You can still deploy the demo, but the flight search functionality will be disabled
-- The agent will still be able to access customer profiles and knowledge base information
-
-To obtain Amadeus API credentials:
-1. Register at [Amadeus for Developers](https://developers.amadeus.com/)
-2. Create a new application to get your API key and secret
-3. Add these credentials to your `.env` file
-
 ### 4. Deployment
 
 Return to the project root directory and run the deployment script:
 ```bash
-cd ../../
-./deploy.sh
+cd ../
+./deploy-industry-sepecific-demo.py
 ```
 
 When prompted, select "airline" as your industry-specific demo.
@@ -80,7 +63,7 @@ When prompted, select "airline" as your industry-specific demo.
 
 After deployment:
 1. Access the frontend URL provided in the deployment output
-2. Sign in with your Cognito credentials
+2. Create a cognito user by going to AWS Console. Sign in with your Cognito credentials. 
 3. Start a conversation with the agent
 4. Try queries like:
    - "I want to check my upcoming flights"

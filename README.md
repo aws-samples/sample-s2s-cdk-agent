@@ -1,7 +1,9 @@
 # Amazon Nova Sonic Call Center Agent w/ Tools
 
-Authors:
-Reilly Manton (rcmanton@amazon.com), Shuto Araki (shuaraki@amazon.com), Andrew Young (ajuny@amazon.com), Ratan Kumar (ratannz@amazon.com)
+**Authors:**
+   - Reilly Manton / Shuto Araki / Andrew Young / Ratan Kumar
+
+**Overview**
 
 This template provides an AWS cloud-based solution for deploying applications that interact with the Amazon Nova Sonic Model. It serves as a foundation for developing future speech-to-speech tooling use cases. Unlike previous implementations that required locally hosted backend and frontend, this cloud architecture leverages:
 
@@ -61,20 +63,28 @@ The versions below are tested and validated. Minor version differences would lik
 - Working microphone and speakers
 
 ### Deployment
+IMPORTANT: Ensure you are deploying to aws region `us-east-1` since this is the only region that currently supports Amazon Nova Sonic model in Amazon Bedrock.
 
-1. go to industry-specific-demo-data, select the industry of your choice if available, else select other for generic implementation. 
+**Option1: Basic deployment**
 
-Copy `template.env` from the selecte folder to a new file `.env` and update the `KNOWLEDGE_BASE_ID` and `DYNAMODB_TABLE_NAME`. If you want to bring your own VPC rather than the solution deploying a new VPC for you, specify your VPC ID in `VPC_ID`.
+Basic deployment will use the tools available inside `backend/tools/` folder and system prompts from the `config/system_prompt.txt` folder to complete the deployment. 
+   - **Step 1**: Copy `template.env` from the selecte folder to a new file `.env` and update the `KNOWLEDGE_BASE_ID` and `DYNAMODB_TABLE_NAME`. If you want to bring your own VPC rather than the solution deploying a new VPC for you, specify your VPC ID in `VPC_ID`.
+   - **Step 2**: Run the deployment script to deploy two stacks: Network and S2S. Make sure both stacks get deployed. `./deploy.sh`
 
-** Note that deployment script will automatically copy this file into project's backend folder. 
+**Option2: Industry specific deployment**
 
-2. Ensure you are deploying to aws region `us-east-1` since this is the only region that currently supports Amazon Nova Sonic model in Amazon Bedrock.
+This approach allows you to quickly deploy industry-tailored demos with appropriate prompts, tools, and sample data already configured.
+   - **Step 1**: Go to the industry-specific-demo-data, you will find deploy-industry-sepecific-demo.py which automates the deployment.
+   - **Step 2**: Select the industry of your choice. If your preferred industry is not available in the `industry-specific-demo-data` directory, select "other" for a generic deployment which you can customize by updating prompts and adding new tools. 
+   - **Step 3**: copy template.env to .env and update the environment variables. Check the README.md for industry specific setup insutructions.
+   - **Step 4**: inside the industry-specific-demo-data folder, run `python deploy-industry-sepecific-demo.py`. You will also be prompted to import sample data for the selected industry. 
+   
+   **Please note that all tools inside `backend/tools/` will be reset by the tools for the selected industry. Make sure you take a backup of your existing tools before deploying for a specific industry.**
 
-3. Run the deployment script to deploy two stacks: Network and S2S. Make sure both stacks get deployed.
+**ASK:** As you setup demos for different industries (insurance, FSI, travel, etc.), we invite you add them inside industry-specific-demo-data. Kindly remove any PII and anonymise the sample data and system prompt before adding them in the folder and submitting a pull request.
 
-`./deploy.sh`
-
-You should see an output like this:
+---
+After completion of successful deployment, you should see an output like this:
 
 ```bash
 Outputs:
@@ -89,7 +99,7 @@ arn:aws:cloudformation:us-east-1:123456789101:stack/S2SStack-dev/{stack_id}
 
 ✨  Total time: 307.96s
 ```
-
+### Setup user to access frontend
 Create a Cognito user in your console and access the frontend URL in your browser to get started.
 
 To create a Cognito user in CLI, use these commands:
@@ -135,7 +145,7 @@ Tooling for Amazon Nova Sonic is implemented using the Model Context Protocol (M
 
 To add a new tool:
 
-1. **Define the tool using MCP decorators** in `backend/mcp_tool_registry.py`.
+1. **Define the tool using MCP decorators** in `backend/tools/mcp_tool_registry.py`.
 
 Tools are defined using the `@mcp_server.tool()` decorator with explicit type annotations. The MCP server automatically generates the tool specifications that get sent to Amazon Nova Sonic. Give your tool a name, description, and specify the input parameters with types. The model uses the description to know when to use the tool and the parameter descriptions to understand the input format.
 
@@ -157,12 +167,12 @@ async def lookup_tool(
         return {"status": "error", "error": str(e)}
 ```
 
-2. **Implement the tool logic** in a separate Python file. You can create a new Python file to implement the tool functionality, like how `backend/retrieve_user_profile.py` implements the user lookup tool and `backend/knowledge_base_lookup.py` implements the knowledge base search tool. These examples show how you can interact with AWS resources via these tools to retrieve real information for the model.
+2. **Implement the tool logic** in a separate Python file. You can create a new Python file to implement the tool functionality, like how `backend/tools/retrieve_user_profile.py` implements the user lookup tool and `backend/tools/knowledge_base_lookup.py` implements the knowledge base search tool. These examples show how you can interact with AWS resources via these tools to retrieve real information for the model.
 
-3. **Import your tool implementation** in `backend/tools.py`. The tool function should import and call your implementation module:
+3. **Import your tool implementation** in `backend/tools/mcp_tool_registry.py`. The tool function should import and call your implementation module:
 
 ```python
-import knowledge_base_lookup
+from . import knowledge_base_lookup
 
 # Then call it in your tool function:
 results = knowledge_base_lookup.main(query)
@@ -181,28 +191,6 @@ Both use a file watching mechanism to be notified of local code changes and relo
 Re-run the `npm` command only if changes are made to the Dockerfile, Python libraries or NPM dependencies that require installation, as these are not picked up by the file watcher.
 
 The frontend is accessible at http://localhost:5173/ and the backend at http://localhost:8080/, with authentication disabled for both.
-
-### Industry specific deployment 
-
-The project contains a folder `industry-specific-demo-data` which contains tools and demo data to allow you to quickly set up demos for specific industries. We hope that this list will grow with open source community participation.
-
-#### Deploying an industry-specific demo
-
-1. **Before deployment**: 
-   - Navigate to the `industry-specific-demo-data` directory and find your preferred industry folder
-   - Copy the `template.env` file from your chosen industry folder to the `backend` folder and rename it to `.env`
-   - Update the values inside the `.env` file with your specific resource information (e.g., knowledge base IDs, DynamoDB table names)
-
-2. **During deployment**:
-   - When running `./deploy.sh`, you will be prompted to choose an industry (airline, telco, etc.)
-   - You will also be prompted to import sample data for that industry
-   - If your preferred industry is not available in the `industry-specific-demo-data` directory, select "other" for a generic voice bot deployment
-
-3. **Custom industry setup**:
-   - If using "other", you'll need to configure your own tools and knowledge base
-   - Follow the tooling customization guidelines in the [Tooling](#tooling) section
-
-This approach allows you to quickly deploy industry-tailored demos with appropriate prompts, tools, and sample data already configured.
 
 ## FAQ/trouble shooting
 

@@ -23,7 +23,7 @@ from decimal import Decimal
 
 def load_env_variables():
     """Load environment variables from .env file"""
-    load_dotenv(dotenv_path="backend/.env")
+    load_dotenv(dotenv_path="../backend/.env")
     table_name = os.getenv('DYNAMODB_TABLE_NAME')
     if not table_name:
         raise ValueError("DYNAMODB_TABLE_NAME not found in .env file")
@@ -87,7 +87,7 @@ def main():
     table_name = load_env_variables()
     
     # Define CSV file path
-    csv_file_path = 'industry-specific-demo-data/telco/sample-data/telco_customer_sample_data.csv'
+    csv_file_path = 'telco/sample-data/telco_customer_sample_data.csv'
     
     # Create DynamoDB table
     table = create_dynamodb_table(table_name)

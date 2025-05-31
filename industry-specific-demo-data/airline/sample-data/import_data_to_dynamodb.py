@@ -23,7 +23,7 @@ from decimal import Decimal
 
 def load_env_variables():
     """Load environment variables from .env file"""
-    load_dotenv(dotenv_path="backend/.env")
+    load_dotenv(dotenv_path="../backend/.env")
     table_name = os.getenv('DYNAMODB_TABLE_NAME')
     if not table_name:
         raise ValueError("DYNAMODB_TABLE_NAME not found in .env file")
@@ -39,16 +39,16 @@ def create_dynamodb_table(table_name):
         print(f"Table {table_name} already exists")
         return dynamodb.Table(table_name)
     
-    # Create table with customerId as partition key and bookingReference as sort key
+    # Create table with frequentFlyerNumber as partition key and bookingReference as sort key
     # Also create a GSI with bookingReference as partition key
     table = dynamodb.create_table(
         TableName=table_name,
         KeySchema=[
-            {'AttributeName': 'customerId', 'KeyType': 'HASH'},  # Partition key
+            {'AttributeName': 'frequentFlyerNumber', 'KeyType': 'HASH'},  # Partition key
             {'AttributeName': 'bookingReference', 'KeyType': 'RANGE'}  # Sort key
         ],
         AttributeDefinitions=[
-            {'AttributeName': 'customerId', 'AttributeType': 'S'},
+            {'AttributeName': 'frequentFlyerNumber', 'AttributeType': 'S'},
             {'AttributeName': 'bookingReference', 'AttributeType': 'S'}
         ],
         GlobalSecondaryIndexes=[
@@ -100,7 +100,7 @@ def main():
     table_name = load_env_variables()
     
     # Define CSV file path
-    csv_file_path = 'industry-specific-demo-data/airline/sample-data/airline_customer_sample_data.csv'
+    csv_file_path = 'airline/sample-data/airline_customer_sample_data.csv'
     
     # Create DynamoDB table
     table = create_dynamodb_table(table_name)

@@ -65,7 +65,7 @@ def get_dynamodb_resource(session=None):
 def submit_request(booking_reference: str, meal_type: str, retry: bool = False, session=None):
     meal_type = str(meal_type)
     booking_reference = str(booking_reference).replace(" ", "").replace("-", "").replace(".", "")
-    logger.info(f"Processing request - Booking Ref: {booking_reference}, Meal Type: {meal_type}")
+    logger.info(f"Processing request - , Meal Type: {meal_type}")
 
     try:
         table_name = get_dynamodb_table_name()
@@ -81,7 +81,7 @@ def submit_request(booking_reference: str, meal_type: str, retry: bool = False, 
         items = response.get('Items', [])
 
         if not items:
-            logger.info(f"No booking records found for booking reference number {booking_reference}")
+            logger.info(f"No booking records found for booking reference number")
             response_obj = defaultResponse.copy()
             response_obj["response"] = response_obj["response"].format(search_value=booking_reference)
             return response_obj
@@ -91,7 +91,7 @@ def submit_request(booking_reference: str, meal_type: str, retry: bool = False, 
             departure_time_str = item.get('departureTime')
 
             if not departure_date_str or not departure_time_str:
-                logger.warning(f"Departure date/time missing for booking {booking_reference}")
+                logger.warning(f"Departure date/time missing for requested booking")
                 return systemError
 
             try:
@@ -104,18 +104,18 @@ def submit_request(booking_reference: str, meal_type: str, retry: bool = False, 
 
             current_time = datetime.now(timezone.utc)
             if departure_time - current_time < timedelta(hours=24):
-                logger.info(f"Meal request rejected for {booking_reference}: Less than 24 hours to departure")
+                logger.info(f"Meal request rejected: Less than 24 hours to departure")
                 return {
                     "status": "error",
                     "response": "Meal requests must be made at least 24 hours before departure. Please contact support."
                 }
 
-            pk = item.get('customerId')
+            pk = item.get('frequentFlyerNumber')
             sk = item.get('bookingReference')
 
             update_response = table.update_item(
                 Key={
-                    'customerId': pk,
+                    'frequentFlyerNumber': pk,
                     'bookingReference': sk
                 },
                 UpdateExpression="SET mealSelected = :meal",
@@ -147,7 +147,7 @@ def submit_request(booking_reference: str, meal_type: str, retry: bool = False, 
         return systemError
 
 def main(booking_reference: str, meal_type: str, session=None):
-    logger.info(f"Received booking reference: {booking_reference} and meal type: {meal_type}")
+    logger.info(f"Received booking request with meal type: {meal_type}")
     result = submit_request(booking_reference, meal_type, session=session)
     logger.info(f"Result: {json.dumps(result)}")
     return result

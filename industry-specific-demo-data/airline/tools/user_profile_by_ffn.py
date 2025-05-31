@@ -17,12 +17,12 @@
 
 """
 @tool
-name: user_profile_by_customer_id
-description: Retrieves a user's profile, including account and flight details, using their customer ID.
+name: user_profile_by_ffn
+description: Retrieves a user's profile, including account and flight details, using their frequentFlyerNumber.
 parameters:
-  - name: customer_id
+  - name: frequentFlyerNumber
     type: string
-    description: The user's customer ID
+    description: The user's frequentFlyerNumber
     required: true
 """
 
@@ -46,7 +46,7 @@ load_dotenv()
 # Default responses
 defaultResponse = {
     "status": "error",
-    "response": "Sorry we couldn't locate you in our records with Customer ID# {search_value}. Could you please check your details again?"
+    "response": "Sorry we couldn't locate you in our records with frequentFlyerNumber {search_value}. Could you please check your details again?"
 }
 
 systemError = {
@@ -68,20 +68,20 @@ def get_dynamodb_resource(session=None):
     return session.resource('dynamodb') if session else boto3.resource('dynamodb')
 
 
-def search_by_customer_id(customer_id: str, retry: bool = False, session=None):
+def search_by_ffn(frequentFlyerNumber: str, retry: bool = False, session=None):
     """
-    Search for booking records by customer ID with retry capability.
+    Search for booking records by frequentFlyerNumber with retry capability.
     
     Args:
-        customer_id: The user's customer ID
+        frequentFlyerNumber: The user's frequentFlyerNumber
         retry: Whether this is a retry attempt
         session: Optional boto3 session to use
         
     Returns:
         Lookup result or error response
     """
-    search_value = str(customer_id).replace(" ", "").replace("-", "").replace(".", "")
-    logger.info(f"Searching by customer_id: {search_value}, retry: {retry}")
+    search_value = str(frequentFlyerNumber).replace(" ", "").replace("-", "").replace(".", "")
+    logger.info(f"Searching by frequentFlyerNumber: {search_value}, retry: {retry}")
     
     try:
         table_name = get_dynamodb_table_name()
@@ -92,9 +92,9 @@ def search_by_customer_id(customer_id: str, retry: bool = False, session=None):
         # Get the table
         table = dynamodb.Table(table_name)
 
-        # Query by customer_id (which maps to customerId in the existing table)
+        # Query by frequentFlyerNumber (which maps to frequentFlyerNumber in the existing table)
         response = table.query(
-            KeyConditionExpression=Key('customerId').eq(search_value)
+            KeyConditionExpression=Key('frequentFlyerNumber').eq(search_value)
         )
 
         # log the response. uncomment it for debugging. 
@@ -120,7 +120,7 @@ def search_by_customer_id(customer_id: str, retry: bool = False, session=None):
             logger.info(f"Upcoming flights found: {json.dumps(result)}")
             return result
 
-        logger.info(f"No booking records found for customer_id: {search_value}")
+        logger.info(f"No booking records found for frequentFlyerNumber: {search_value}")
         response_obj = defaultResponse.copy()
         response_obj["response"] = response_obj["response"].format(search_value=search_value)
         return response_obj
@@ -138,7 +138,7 @@ def search_by_customer_id(customer_id: str, retry: bool = False, session=None):
         if error_code == 'ExpiredTokenException' and not retry:
             logger.info("Retrying with refreshed session due to ExpiredTokenException")
             new_session = boto3.Session()
-            return search_by_customer_id(customer_id, retry=True, session=new_session)
+            return search_by_ffn(frequentFlyerNumber, retry=True, session=new_session)
             
         return systemError
 
@@ -151,27 +151,27 @@ def search_by_customer_id(customer_id: str, retry: bool = False, session=None):
         return systemError
 
 
-def main(customer_id: str, session=None):
+def main(frequentFlyerNumber: str, session=None):
     """
-    Search for booking records by customer ID.
+    Search for booking records by frequentFlyerNumber.
     
-    :param customer_id: The user's customer ID
+    :param frequentFlyerNumber: The user's frequentFlyerNumber 
     :param session: Optional boto3 session to use
         
     :return: Lookup result or error response
     """
-    logger.info(f"in main function called with customer_id: {customer_id}")
-    return search_by_customer_id(customer_id, session=session)
+    logger.info(f"in main function called with frequentFlyerNumber: {frequentFlyerNumber}")
+    return search_by_ffn(frequentFlyerNumber, session=session)
 
 
 # For direct testing
 if __name__ == "__main__":
     import sys
     if len(sys.argv) != 2:
-        print("Usage: python user_profile_by_customer_id.py <customer_id>")
+        print("Usage: python user_profile_by_ffn.py <frequentFlyerNumber>")
         sys.exit(1)
     
-    customer_id_arg = sys.argv[1]
-    result = main(customer_id_arg)
+    frequentFlyerNumber = sys.argv[1]
+    result = main(frequentFlyerNumber)
     print(json.dumps(result, indent=2))
     sys.exit(0 if result and result.get("status") == "success" else 1)

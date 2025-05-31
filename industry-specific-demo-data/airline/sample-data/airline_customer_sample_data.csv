@@ -1,4 +1,4 @@
-customerId,bookingReference,arrivalAirport,departureAirport,departureDate,departureTime,emailID,flightNumber,fullName,mealSelected,seatNumber
+frequentFlyerNumber,bookingReference,arrivalAirport,departureAirport,departureDate,departureTime,emailID,flightNumber,fullName,mealSelected,seatNumber
 7642035,DUA4VV,BNE,WLG,2025-06-03,15:03,joe.bloggs@example.com,NZ764,Joe Bloggs,Vegetarian,11A
 7642035,STA6NI,PER,ADL,2025-06-11,21:16,joe.bloggs@example.com,NZ577,Joe Bloggs,Vegan,23C
 7642035,QBU6KJ,WLG,BNE,2025-06-10,18:03,joe.bloggs@example.com,NZ101,Joe Bloggs,,12A

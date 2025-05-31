@@ -89,7 +89,7 @@ def create_ticket(issue_summary, booking_reference, retry=False, session=None):
     try:
         # Format booking reference (remove spaces, dashes, etc.)
         booking_reference = str(booking_reference).replace(" ", "").replace("-", "").replace(".", "").upper()
-        logger.info(f"Creating support ticket for booking reference: {booking_reference}, retry: {retry}")
+        logger.info(f"Creating support ticket for provided booking reference, retry: {retry}")
         
         # Initialize DynamoDB client with the provided session or default
         dynamodb = get_dynamodb_resource(session)
@@ -124,7 +124,7 @@ def create_ticket(issue_summary, booking_reference, retry=False, session=None):
                 item = response['Items'][0]
                 
                 # Get the primary key values
-                pk = item.get('customerId') or ""
+                pk = item.get('frequentFlyerNumber') or ""
                 sk = item.get('bookingReference') or ""
                 
                 # Check if support_tickets already exists
@@ -140,7 +140,7 @@ def create_ticket(issue_summary, booking_reference, retry=False, session=None):
                 # Update the item
                 update_response = table.update_item(
                     Key={
-                        'customerId': pk,
+                        'frequentFlyerNumber': pk,
                         'bookingReference': sk
                     },
                     UpdateExpression=update_expression,
@@ -150,10 +150,10 @@ def create_ticket(issue_summary, booking_reference, retry=False, session=None):
                 
                 # logger.info(f"Support ticket added to existing record: {json.dumps(update_response)}")
             else:
-                logger.error(f"No booking found with reference: {booking_reference}")
+                logger.error(f"No booking found with provided booking reference")
                 return {
                     "status": "error",
-                    "message": f"No booking found with reference: {booking_reference}"
+                    "message": f"No booking found with provided booking reference"
                 }
                 
         except ClientError as e:
@@ -215,7 +215,7 @@ def main(issue_summary, booking_reference, session=None):
     Returns:
         dict: Result with status and message
     """
-    logger.info(f"Creating support ticket with summary: '{issue_summary}' for booking reference: {booking_reference}")
+    logger.info(f"Creating support ticket with summary: '{issue_summary}' for the provided booking reference")
     return create_ticket(issue_summary, booking_reference, session=session)
 
 if __name__ == "__main__":

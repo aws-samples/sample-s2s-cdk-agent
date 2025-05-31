@@ -23,10 +23,8 @@ The telecom demo includes:
    - `KNOWLEDGE_BASE_ID`: Your Amazon Bedrock Knowledge Base ID containing telecom FAQs, plans, and policies
    - `DYNAMODB_TABLE_NAME`: Your DynamoDB table name for customer data
 
-3. Copy the `.env` file to the backend folder:
-   ```bash
-   cp .env ../../backend/
-   ```
+3. `.env` will be automatically copied to backend folder by the deployment script.
+
 
 ### 2. Sample Data Import
 
@@ -70,8 +68,8 @@ The agent will use this knowledge base to provide accurate information to custom
 
 Return to the project root directory and run the deployment script:
 ```bash
-cd ../../
-./deploy.sh
+cd ../
+./deploy-industry-sepecific-demo.py
 ```
 
 When prompted, select "telco" as your industry-specific demo.

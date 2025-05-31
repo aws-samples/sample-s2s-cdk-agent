@@ -20,7 +20,7 @@ from mcp_server import mcp_server
 import logging
 from . import knowledge_base_lookup
 from . import user_profile_by_booking_reference
-from . import user_profile_by_customer_id
+from . import user_profile_by_ffn
 from . import create_support_ticket
 from . import request_for_special_meal
 
@@ -61,23 +61,21 @@ async def user_profile_by_booking_reference_tool(
         logger.error(f"Error in user profile search by booking reference: {str(e)}", exc_info=True)
         return {"status": "error", "error": str(e)}
 
-# User Profile Search Tool by Customer ID
+# User Profile Search Tool by Frequent Flyer Number 
 @mcp_server.tool(
-    name="userProfileByCustomerId",
-    description="Search for a user's flight booking information using their customer ID"
+    name="userProfileByFrequentFlyerNumber",
+    description="Search for a user's flight booking information using their frequent flyer number"
 )
-async def user_profile_by_customer_id_tool(
-    customer_id: Annotated[Union[int, str], Field(description="the user's customer ID")]
-    # phone_number: Annotated[Union[int, str], Field(description="the user's phone number")]
-
+async def user_profile_by_frequent_flyer_number_tool(
+    frequentFlyerNumber: Annotated[Union[int, str], Field(description="the user's frequent flyer number")]
 ) -> dict:
-    """Search for user flight booking information by customer ID"""
+    """Search for user flight booking information by frequent flyer number"""
     try:
-        logger.info(f"User profile search by customer ID: {customer_id}")
-        results = user_profile_by_customer_id.main(customer_id)
+        logger.info(f"User profile search by frequent flyer number: {frequentFlyerNumber}")
+        results = user_profile_by_ffn.main(frequentFlyerNumber)
         return results  
     except Exception as e:
-        logger.error(f"Error in user profile search by customer ID: {str(e)}", exc_info=True)
+        logger.error(f"Error in user profile search by frequent flyer number: {str(e)}", exc_info=True)
         return {"status": "error", "error": str(e)}
 
 # Create a support ticket

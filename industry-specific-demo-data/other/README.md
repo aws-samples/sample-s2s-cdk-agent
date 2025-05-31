@@ -24,10 +24,8 @@ The generic implementation includes:
    - `KNOWLEDGE_BASE_ID`: Your Amazon Bedrock Knowledge Base ID containing your domain-specific information
    - `DYNAMODB_TABLE_NAME`: Your DynamoDB table name for customer data
 
-3. Copy the `.env` file to the backend folder:
-   ```bash
-   cp .env ../../backend/
-   ```
+3. `.env` will be automatically copied to backend folder by the deployment script.
+
 
 ### 2. Knowledge Base Setup
 
@@ -45,42 +43,12 @@ The knowledge base tool allows the agent to retrieve information from your Amazo
    ```
    KNOWLEDGE_BASE_ID=your-knowledge-base-id
    ```
-
-### 3. Customer Profile Data Structure
-
-The default customer profile tool expects a DynamoDB table with the following structure:
-- Primary key: `phone_number` (String)
-- Additional attributes: You can add any attributes relevant to your use case
-
-Example attributes you might want to include:
-- `name`: Customer's full name
-- `email`: Customer's email address
-- `account_id`: Customer's account identifier
-- `status`: Account status (active, suspended, etc.)
-- `plan`: Current subscription plan
-- `current_bill`: Current billing amount
-- Any other industry-specific attributes
-
-### 4. Sample Data Import
-
-To create and populate your DynamoDB table:
-
-1. Create a CSV file with your customer data following this structure:
-   ```
-   phone_number,name,email,account_id,status,plan,current_bill,...
-   "+15551234567","John Doe","john.doe@example.com","ACC123456","active","premium","75.99",...
-   ```
-
-2. Use the AWS Management Console or AWS CLI to create your DynamoDB table with `phone_number` as the primary key
-
-3. Import your data using the AWS Management Console or a script similar to the one in the sample-data directory
-
-### 5. Deployment
+### 3. Deployment
 
 Return to the project root directory and run the deployment script:
 ```bash
-cd ../../
-./deploy.sh
+cd ../
+./deploy-industry-sepecific-demo.py
 ```
 
 When prompted, select "other" as your industry-specific demo.
@@ -164,30 +132,4 @@ If you want to create a new industry-specific implementation:
 4. Add any industry-specific tools to the `tools` directory
 5. Create sample data relevant to your industry
 6. Update the deployment script to include your new industry option
-
-## Knowledge Base Tool Usage
-
-The knowledge base tool is particularly important for the generic implementation as it allows the agent to access domain-specific information:
-
-1. **Tool Description**: The knowledge base tool is designed to search your knowledge base for relevant information based on user queries.
-
-2. **When It's Used**: The agent will automatically use this tool when:
-   - A user asks a question that might be answered by information in your knowledge base
-   - The agent needs to provide specific details about policies, procedures, or offerings
-   - The agent needs to verify information before responding to the user
-
-3. **Tool Parameters**:
-   - `query`: The search query to run against your knowledge base
-
-4. **Response Format**: The tool returns search results including:
-   - Relevant text snippets from your knowledge base
-   - Source document information
-   - Relevance scores
-
-5. **Optimizing Knowledge Base Queries**:
-   - Structure your knowledge base documents with clear headings and sections
-   - Include a variety of common questions and their answers
-   - Use consistent terminology throughout your documents
-   - Regularly update your knowledge base with new information
-
-By leveraging the knowledge base tool effectively, you can create a highly informed agent that can answer a wide range of domain-specific questions without requiring extensive custom coding.
+7. add .env file with list of environment variables (e.g. KNOWLEDGE_BASE_ID)
