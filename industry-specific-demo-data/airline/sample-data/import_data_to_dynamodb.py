@@ -17,17 +17,25 @@
 
 import boto3
 import csv
+import sys
 import os
 from dotenv import load_dotenv
 from decimal import Decimal
 
 def load_env_variables():
     """Load environment variables from .env file"""
-    load_dotenv(dotenv_path="../backend/.env")
-    table_name = os.getenv('DYNAMODB_TABLE_NAME')
-    if not table_name:
-        raise ValueError("DYNAMODB_TABLE_NAME not found in .env file")
-    return table_name
+    env_loaded = load_dotenv(dotenv_path="../.env", override=True)
+
+    if not env_loaded: 
+        # return error
+        print('.env file not found. Copy template.env as .env and update the environment variable. Aborting deployment.')
+        sys.exit(1)  # Exit the program with a non-zero exit code
+    else: 
+        print(os.getenv('DYNAMODB_TABLE_NAME'))       
+        table_name = os.getenv('DYNAMODB_TABLE_NAME')
+        if not table_name:
+            raise ValueError("DYNAMODB_TABLE_NAME not found in .env file")
+        return table_name
 
 def create_dynamodb_table(table_name):
     """Create DynamoDB table if it doesn't exist"""

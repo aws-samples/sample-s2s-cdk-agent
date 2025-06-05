@@ -78,4 +78,4 @@ def main(query):
 
 
 if __name__ == "__main__":
-    sys.exit(main("Inernational Roaming Plans"))
+    sys.exit(main(""))
