@@ -64,7 +64,14 @@ IMPORTANT: Ensure you are deploying to aws region `us-east-1` since this is the 
 **Option1: Basic deployment**
 
 Basic deployment will use the tools available inside `backend/tools/` folder and system prompts from the `config/system_prompt.txt` folder to complete the deployment. 
-   - **Step 1**: Copy `template.env` from the selecte folder to a new file `.env` and update the `KNOWLEDGE_BASE_ID` and `DYNAMODB_TABLE_NAME`. If you want to bring your own VPC rather than the solution deploying a new VPC for you, specify your VPC ID in `VPC_ID`.
+   - **Step 1**: Copy `template.env` from the selecte folder to a new file `.env`. 
+   
+   For  `KNOWLEDGE_BASE_ID`, provide your Amazon Bedrock Knowledge Base ID. 
+   
+   For `DYNAMODB_TABLE_NAME`, create a dynamo DB table with phone_number as primary key. You can add additional columns like customerName, plan, monthlyBill, dataUsage, minsUsed, contractEndDate,accountStatus, paymentMethod, fullAddress, etc. as per your requirements. You can manually add some sample data in the table, or you can look at a sample csv file inside industry-specific-demo-data/telco/sample-data/telco_customer_sample_data.csv. Put the name of the dynamodb table inside the .env file. 
+   
+   If you want to bring your own VPC rather than the solution deploying a new VPC for you, specify your VPC ID in `VPC_ID`.
+
    - **Step 2**: Run the deployment script to deploy two stacks: Network and S2S. Make sure both stacks get deployed. `./deploy.sh`
 
 **Option2: Industry specific deployment**
@@ -75,7 +82,7 @@ This approach allows you to quickly deploy industry-tailored demos with appropri
    - **Step 3**: copy template.env to .env and update the environment variables. Check the README.md for industry specific setup insutructions.
    - **Step 4**: inside the industry-specific-demo-data folder, run `python deploy-industry-sepecific-demo.py`. You will also be prompted to import sample data for the selected industry. 
    
-   **Please note that all tools inside `backend/tools/` will be reset by the tools for the selected industry. Make sure you take a backup of your existing tools before deploying for a specific industry.**
+   **Please note that during deployment all tools inside `backend/tools/` will be reset by the tools for the selected industry. Make sure you take a backup of your existing tools in the backend/tools folder before deploying for a specific industry.**
 
 **ASK:** As you setup demos for different industries (insurance, FSI, travel, etc.), we invite you add them inside industry-specific-demo-data. Kindly remove any PII and anonymise the sample data and system prompt before adding them in the folder and submitting a pull request.
 
