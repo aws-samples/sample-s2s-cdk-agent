@@ -13,7 +13,6 @@
 # permissions and limitations under the License.
 #
 
-# mcp_tool_registry.py
 from typing import Annotated, Union
 from pydantic import Field
 from mcp_server import mcp_server

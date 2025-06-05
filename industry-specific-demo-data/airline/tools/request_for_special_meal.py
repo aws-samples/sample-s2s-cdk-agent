@@ -11,20 +11,6 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 
-"""
-@tool
-name: request_for_special_meal
-description: Use this tool when a user wants to request a special meal for their flight or request for a change in the meal already ordered.
-parameters:
-  - name: booking_reference
-    type: string
-    description: The booking reference for the flight
-    required: true
-  - name: meal_type
-    type: string
-    description: The type of special meal requested
-    required: true
-"""
 
 import boto3
 from boto3.dynamodb.conditions import Key

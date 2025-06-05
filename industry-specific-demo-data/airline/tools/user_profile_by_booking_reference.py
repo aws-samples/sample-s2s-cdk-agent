@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 #
 # Copyright 2025 Amazon.com, Inc. and its affiliates. All Rights Reserved.
 #
@@ -14,17 +12,6 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 #
-
-"""
-@tool
-name: user_profile_by_booking_reference
-description: Retrieves a user's profile, including account and flight details, using their booking reference.
-parameters:
-  - name: booking_reference
-    type: string
-    description: The user's booking reference
-    required: true
-"""
 
 import os
 import json

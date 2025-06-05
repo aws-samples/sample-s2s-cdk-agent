@@ -30,8 +30,10 @@ The airline demo includes:
 
 The `sample-data` directory contains:
 - `airline_customer_sample_data.csv`: Sample customer data and their upcoming flights.
-[IMPORTANT] : update the departure and arrival date to make sure they are in the future. Tools are implemented to only bring upcoming flights.
-  
+[IMPORTANT] : Review the csv file and update the departure date to make sure they are in the future. Tools are implemented to only bring upcoming flights.
+
+Note: You can skip rest of the step and go to "Deployment" step where you will be prompted for option to import data. Use following steps to import data if you are customising the sample data or import script and want to test the import script without running the full deployment. 
+
 To import this sample data to your DynamoDB table:
 
 1. Navigate to the sample-data directory:
@@ -49,7 +51,7 @@ To import this sample data to your DynamoDB table:
    python import_data_to_dynamodb.py
    ```
 
-### 4. Deployment
+### 3. Deployment
 
 Return to the project root directory and run the deployment script:
 ```bash
@@ -57,7 +59,7 @@ cd ../
 ./deploy-industry-sepecific-demo.py
 ```
 
-When prompted, select "airline" as your industry-specific demo.
+When prompted, select "airline" as your industry-specific demo. 
 
 ## Testing the Demo
 

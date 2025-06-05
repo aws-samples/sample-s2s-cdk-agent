@@ -1,21 +1,17 @@
 # Amazon Nova Sonic Call Center Agent w/ Tools
 
-**Authors:**
-   - Reilly Manton / Shuto Araki / Andrew Young / Ratan Kumar
-
 **Overview**
 
-This template provides an AWS cloud-based solution for deploying applications that interact with the Amazon Nova Sonic Model. It serves as a foundation for developing future speech-to-speech tooling use cases. Unlike previous implementations that required locally hosted backend and frontend, this cloud architecture leverages:
+This template provides an AWS cloud-based solution for deploying applications that interact with the Amazon Nova Sonic Model. It serves as a foundation for developing future speech-to-speech tooling use cases. Unlike other implementations that required locally hosted backend and frontend, this cloud architecture leverages:
 
 - **Frontend:** Hosted on Amazon CloudFront and S3
 - **Backend:** Deployed on Amazon ECS
 - **Connection:** Websocket communication through Network Load Balancer (NLB)
 - **Authentication:** Integrated Amazon Cognito authentication
 
-The sample application demonstrates Amazon Nova Sonic model interactions in a customer support context. The model acts as AnyTelco's call center agent Telly and responds to the user in real time. It has two tools at its disposal to augment its knowledge with data:
-
-1. Customer information lookup via phone number
-2. Knowledge base search for AnyTelco company information such as plan features and pricing
+The sample application demonstrates Amazon Nova Sonic model interactions in a customer support context. There are two deployment options: 
+- 1. Basic deployment where you get a Agentic AI powered digital concierge for AnyTelco handling customer calls and responding to the customers in real time. 
+- 2. Industry specific deployment where you get option to deploy the solution for an industry (airline, telco, etc.) of your choice with industry specific sample data and set of MCP tools. This is a quick and easy way to deploy the solution before you customise it for your specific use cases. 
 
 **Note:** This is a sample application. For production, please modify the application to align with your security standards.
 
@@ -131,7 +127,7 @@ aws cognito-idp admin-create-user \
 2. Speak into your microphone to interact with the application. You are acting as the customer and the solution acts as the call center agent.
 3. The chat history will automatically update with the discussion transcript and the assistant audio will play through your speakers.
 
-## Customization:
+## Customization
 
 ### Prompting
 
@@ -206,3 +202,10 @@ FROM --platform=$TARGETARCH python:3.12
 2. `npm run dev` hangs and the backend container does not exit. I get the error `docker: Error response from daemon: driver failed programming external connectivity on endpoint s2s-backend-dev` when I try to run the command again.
 
 Run `docker rm -f s2s-backend-dev` to remove the running container image and run `npm run dev` again.
+
+## Contributors
+
+- [Reilly Manton](https://www.linkedin.com/in/reilly-manton/)  
+- [Shuto Araki](https://www.linkedin.com/in/shuto-araki/)  
+- [Andrew Young](https://www.linkedin.com/in/andrewjunyoung/)  
+- [Ratan Kumar](https://www.linkedin.com/in/kumar-ratan/)

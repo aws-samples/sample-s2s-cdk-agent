@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 #
 # Copyright 2025 Amazon.com, Inc. and its affiliates. All Rights Reserved.
 #

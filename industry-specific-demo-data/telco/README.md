@@ -21,12 +21,24 @@ The telecom demo includes:
    - `ENV`: Your deployment environment (e.g., "dev", "prod")
    - `VPC_ID`: (Optional) Your VPC ID if you want to use an existing VPC
    - `KNOWLEDGE_BASE_ID`: Your Amazon Bedrock Knowledge Base ID containing telecom FAQs, plans, and policies
-   - `DYNAMODB_TABLE_NAME`: Your DynamoDB table name for customer data
+   - `DYNAMODB_TABLE_NAME`: Your DynamoDB table name for customer data (e.g telco_demo_customer_data). This DynamoDB table will be automatically created (if doesn't exist), in step "2. Sample data import" below or as part of the deployment script (by running ./deploy-industry-sepecific-demo.py).
 
 3. `.env` will be automatically copied to backend folder by the deployment script.
 
+### 2. Knowledge Base Setup
 
-### 2. Sample Data Import
+For optimal performance, your knowledge base should contain information about:
+- Telecom plans and pricing
+- Device upgrade policies
+- International roaming information
+- Troubleshooting common issues
+- Billing policies
+
+The agent will use this knowledge base to provide accurate information to customers.
+
+### 3. Sample Data Import
+
+Note: You can skip this step and go to "Deployment" step where you will be prompted for option to import data. Use following steps to import data if you are customising the sample data or import script and want to test the import script without running the full deployment. 
 
 The `sample-data` directory contains:
 - `telco_customer_sample_data.csv`: Sample customer profiles with telecom-specific fields like:
@@ -35,8 +47,6 @@ The `sample-data` directory contains:
   - Data usage
   - Contract information
   - Account status
-  
-To import this sample data to your DynamoDB table:
 
 1. Navigate to the sample-data directory:
    ```bash
@@ -53,16 +63,6 @@ To import this sample data to your DynamoDB table:
    python import_data_to_dynamodb.py
    ```
 
-### 3. Knowledge Base Setup
-
-For optimal performance, your knowledge base should contain information about:
-- Telecom plans and pricing
-- Device upgrade policies
-- International roaming information
-- Troubleshooting common issues
-- Billing policies
-
-The agent will use this knowledge base to provide accurate information to customers.
 
 ### 4. Deployment
 

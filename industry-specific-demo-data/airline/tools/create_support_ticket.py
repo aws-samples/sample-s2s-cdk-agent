@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 #
 # Copyright 2025 Amazon.com, Inc. and its affiliates. All Rights Reserved.
 #
@@ -14,24 +12,6 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 #
-
-"""
-@tool
-name: create_support_ticket
-description: Creates a support ticket by logging the details of the customer issue in DynamoDB.
-input_schema:
-  type: object
-  properties:
-    issue_summary:
-      type: string
-      description: A summary of the issue raised by the user
-    booking_reference:
-      type: string
-      description: The booking reference to associate with the support ticket
-  required:
-    - issue_summary
-    - booking_reference
-"""
 
 import boto3
 import logging
