@@ -110,9 +110,10 @@ export class S2SAppStack extends cdk.Stack {
 
     const dynamoDbReadPolicy = new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
-      actions: ["dynamodb:GetItem", "dynamodb:BatchGetItem"],
+      actions: ["dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Scan", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem"],
       resources: [
         `arn:aws:dynamodb:${this.region}:${this.account}:table/${dynamoDbTableName}`,
+        `arn:aws:dynamodb:${this.region}:${this.account}:table/${dynamoDbTableName}/index/*`,
       ],
     });
 

@@ -1,0 +1,11 @@
+phone_number,customerName,plan,monthlyBill,dataUsage,minsUsed,contractEndDate,accountStatus,paymentMethod,fullAddress
+029470155,Joe Bloggs,Premium Unlimited,89.99,15.2,320,2025-12-15,Active,Credit Card,"464 Random St, Suburb 1 XX 5192"
+025342291,Jane Doe,Basic Plan,45.5,5.7,180,2025-08-22,Active,Bank Transfer,"798 Random St, Suburb 2 XX 9068"
+024500332,John Citizen,Family Share,129.99,32.5,750,2026-03-10,Active,Credit Card,"209 Random St, Suburb 3 XX 9141"
+028626999,Emily Bloggs,Premium Unlimited,89.99,18.3,410,2025-10-05,Active,PayPal,"665 Random St, Suburb 4 XX 9428"
+025038735,Tom Sample,Basic Plan,45.5,4.2,120,2025-07-18,Past Due,Credit Card,"414 Random St, Suburb 5 XX 6012"
+026509174,Jenny Public,Premium Unlimited,89.99,22.1,280,2026-01-30,Active,Bank Transfer,"631 Random St, Suburb 6 XX 9107"
+022278649,Robert Example,Family Share,129.99,45.6,920,2025-11-12,Active,Credit Card,"436 Random St, Suburb 7 XX 9426"
+024707050,Lisa Placeholder,Basic Plan,45.5,6.8,210,2025-09-25,Suspended,PayPal,"951 Random St, Suburb 8 XX 1883"
+021907607,Dan Specimen,Premium Unlimited,89.99,17.5,350,2026-02-14,Active,Credit Card,"840 Random St, Suburb 9 XX 7497"
+021766885,Michelle Placeholder,Family Share,129.99,38.2,830,2025-08-08,Active,Bank Transfer,"964 Random St, Suburb 10 XX 7299"

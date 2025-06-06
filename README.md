@@ -1,18 +1,17 @@
 # Amazon Nova Sonic Call Center Agent w/ Tools
 
-By Reilly Manton (rcmanton@amazon.com); Shuto Araki (shuaraki@amazon.com); Andrew Young (ajuny@amazon.com)
+**Overview**
 
-This template provides an AWS cloud-based solution for deploying applications that interact with the Amazon Nova Sonic Model. It serves as a foundation for developing future speech-to-speech tooling use cases. Unlike previous implementations that required locally hosted backend and frontend, this cloud architecture leverages:
+This template provides an AWS cloud-based solution for deploying applications that interact with the Amazon Nova Sonic Model. It serves as a foundation for developing future speech-to-speech tooling use cases. Unlike other implementations that required locally hosted backend and frontend, this cloud architecture leverages:
 
 - **Frontend:** Hosted on Amazon CloudFront and S3
 - **Backend:** Deployed on Amazon ECS
 - **Connection:** Websocket communication through Network Load Balancer (NLB)
 - **Authentication:** Integrated Amazon Cognito authentication
 
-The sample application demonstrates Amazon Nova Sonic model interactions in a customer support context. The model acts as AnyTelco's call center agent Telly and responds to the user in real time. It has two tools at its disposal to augment its knowledge with data:
-
-1. Customer information lookup via phone number
-2. Knowledge base search for AnyTelco company information such as plan features and pricing
+The sample application demonstrates Amazon Nova Sonic model interactions in a customer support context. There are two deployment options: 
+- 1. Basic deployment where you get a Agentic AI powered digital concierge for AnyTelco handling customer calls and responding to the customers in real time. 
+- 2. Industry specific deployment where you get option to deploy the solution for an industry (airline, telco, etc.) of your choice with industry specific sample data and set of MCP tools. This is a quick and easy way to deploy the solution before you customise it for your specific use cases. 
 
 **Note:** This is a sample application. For production, please modify the application to align with your security standards.
 
@@ -60,24 +59,35 @@ The versions below are tested and validated. Minor version differences would lik
 - Working microphone and speakers
 
 ### Deployment
+IMPORTANT: Ensure you are deploying to aws region `us-east-1` since this is the only region that currently supports Amazon Nova Sonic model in Amazon Bedrock.
 
-1. [Optional] Update the environment variables to point to your Amazon Dynamodb table and your Bedrock Knowledge Base
+**Option1: Basic deployment**
 
-You can skip this section if you don't intend to use these tools or build your own with a simple interaction with Amazon Nova Sonic.
+Basic deployment will use the tools available inside `backend/tools/` folder and system prompts from the `config/system_prompt.txt` folder to complete the deployment. 
+   - **Step 1**: Copy `template.env` from the selecte folder to a new file `.env`. 
+   
+   For  `KNOWLEDGE_BASE_ID`, provide your Amazon Bedrock Knowledge Base ID. 
+   
+   For `DYNAMODB_TABLE_NAME`, create a dynamo DB table with phone_number as primary key. You can add additional columns like customerName, plan, monthlyBill, dataUsage, minsUsed, contractEndDate,accountStatus, paymentMethod, fullAddress, etc. as per your requirements. You can manually add some sample data in the table, or you can look at a sample csv file inside industry-specific-demo-data/telco/sample-data/telco_customer_sample_data.csv. Put the name of the dynamodb table inside the .env file. 
+   
+   If you want to bring your own VPC rather than the solution deploying a new VPC for you, specify your VPC ID in `VPC_ID`.
 
-Copy `template.env` to a new file `.env` and update the `KNOWLEDGE_BASE_ID` and `DYNAMODB_TABLE_NAME` to your knowledge base ID and your table name. For table structure, the tool expects `phone_number` (S) as the primary key (assuming telecom call center use case) and you can add any other keys you want. (e.g., "plan", "current_bill", etc.) Ask about those attributes in the chat to confirm the profile search tool is working. Knowledge base can be loaded with your own contact center guideline texts as needed.
+   - **Step 2**: Run the deployment script to deploy two stacks: Network and S2S. Make sure both stacks get deployed. `./deploy.sh`
 
-We may add a separate construct to create those resources through CDK if there is enough demand. Let us know by raising an issue.
+**Option2: Industry specific deployment**
 
-If you want to bring your own VPC rather than the solution deploying a new VPC for you, specify your VPC ID in `VPC_ID`.
+This approach allows you to quickly deploy industry-tailored demos with appropriate prompts, tools, and sample data already configured.
+   - **Step 1**: Go to the industry-specific-demo-data, you will find deploy-industry-sepecific-demo.py which automates the deployment.
+   - **Step 2**: Select the industry of your choice. If your preferred industry is not available in the `industry-specific-demo-data` directory, select "other" for a generic deployment which you can customize by updating prompts and adding new tools. 
+   - **Step 3**: copy template.env to .env and update the environment variables. Check the README.md for industry specific setup insutructions.
+   - **Step 4**: inside the industry-specific-demo-data folder, run `python deploy-industry-sepecific-demo.py`. You will also be prompted to import sample data for the selected industry. 
+   
+   **Please note that during deployment all tools inside `backend/tools/` will be reset by the tools for the selected industry. Make sure you take a backup of your existing tools in the backend/tools folder before deploying for a specific industry.**
 
-2. Ensure you are deploying to aws region `us-east-1` since this is the only region that currently supports Amazon Nova Sonic model in Amazon Bedrock.
+**ASK:** As you setup demos for different industries (insurance, FSI, travel, etc.), we invite you add them inside industry-specific-demo-data. Kindly remove any PII and anonymise the sample data and system prompt before adding them in the folder and submitting a pull request.
 
-3. Run the deployment script to deploy two stacks: Network and S2S. Make sure both stacks get deployed.
-
-`./deploy.sh`
-
-You should see an output like this:
+---
+After completion of successful deployment, you should see an output like this:
 
 ```bash
 Outputs:
@@ -92,7 +102,7 @@ arn:aws:cloudformation:us-east-1:123456789101:stack/S2SStack-dev/{stack_id}
 
 ✨  Total time: 307.96s
 ```
-
+### Setup user to access frontend
 Create a Cognito user in your console and access the frontend URL in your browser to get started.
 
 To create a Cognito user in CLI, use these commands:
@@ -124,7 +134,7 @@ aws cognito-idp admin-create-user \
 2. Speak into your microphone to interact with the application. You are acting as the customer and the solution acts as the call center agent.
 3. The chat history will automatically update with the discussion transcript and the assistant audio will play through your speakers.
 
-## Customization:
+## Customization
 
 ### Prompting
 
@@ -138,7 +148,7 @@ Tooling for Amazon Nova Sonic is implemented using the Model Context Protocol (M
 
 To add a new tool:
 
-1. **Define the tool using MCP decorators** in `backend/tools.py`.
+1. **Define the tool using MCP decorators** in `backend/tools/mcp_tool_registry.py`.
 
 Tools are defined using the `@mcp_server.tool()` decorator with explicit type annotations. The MCP server automatically generates the tool specifications that get sent to Amazon Nova Sonic. Give your tool a name, description, and specify the input parameters with types. The model uses the description to know when to use the tool and the parameter descriptions to understand the input format.
 
@@ -160,12 +170,12 @@ async def lookup_tool(
         return {"status": "error", "error": str(e)}
 ```
 
-2. **Implement the tool logic** in a separate Python file. You can create a new Python file to implement the tool functionality, like how `backend/retrieve_user_profile.py` implements the user lookup tool and `backend/knowledge_base_lookup.py` implements the knowledge base search tool. These examples show how you can interact with AWS resources via these tools to retrieve real information for the model.
+2. **Implement the tool logic** in a separate Python file. You can create a new Python file to implement the tool functionality, like how `backend/tools/retrieve_user_profile.py` implements the user lookup tool and `backend/tools/knowledge_base_lookup.py` implements the knowledge base search tool. These examples show how you can interact with AWS resources via these tools to retrieve real information for the model.
 
-3. **Import your tool implementation** in `backend/tools.py`. The tool function should import and call your implementation module:
+3. **Import your tool implementation** in `backend/tools/mcp_tool_registry.py`. The tool function should import and call your implementation module:
 
 ```python
-import knowledge_base_lookup
+from . import knowledge_base_lookup
 
 # Then call it in your tool function:
 results = knowledge_base_lookup.main(query)
@@ -199,3 +209,10 @@ FROM --platform=$TARGETARCH python:3.12
 2. `npm run dev` hangs and the backend container does not exit. I get the error `docker: Error response from daemon: driver failed programming external connectivity on endpoint s2s-backend-dev` when I try to run the command again.
 
 Run `docker rm -f s2s-backend-dev` to remove the running container image and run `npm run dev` again.
+
+## Contributors
+
+- [Reilly Manton](https://www.linkedin.com/in/reilly-manton/)  
+- [Shuto Araki](https://www.linkedin.com/in/shuto-araki/)  
+- [Andrew Young](https://www.linkedin.com/in/andrewjunyoung/)  
+- [Ratan Kumar](https://www.linkedin.com/in/kumar-ratan/)
