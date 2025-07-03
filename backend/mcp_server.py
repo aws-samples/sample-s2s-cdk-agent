@@ -68,17 +68,22 @@ async def handle_bedrock_tool_call(tool_name, tool_content):
         # Execute the tool
         result = await tool.run(params)
 
-        # FastMcp wraps tool responses in a TextContentWrapper so we have to remove it here
-        if isinstance(result, list) and len(result) > 0:
-            # Check if it's a TextContent object
-            if hasattr(result[0], 'text'):
-                actual_text = result[0].text
+        # Handle different result types
+        if hasattr(result, 'content') and result.content:
+            content = result.content[0] if isinstance(result.content, list) else result.content
+            if hasattr(content, 'text'):
+                actual_text = content.text
                 try:
                     return json.loads(actual_text)
                 except:
                     return actual_text
+        elif hasattr(result, 'structured_content') and result.structured_content:
+            return result.structured_content
+        elif isinstance(result, (dict, list)):
+            return result
         
-        return result
+        return str(result)
+        
     except Exception as e:
         logger.error(f"Error handling tool call: {str(e)}", exc_info=True)
         return {"status": "error", "error": f"Tool execution failed: {str(e)}"}
